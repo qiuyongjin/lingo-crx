@@ -18,6 +18,7 @@ declare global {
   const extractWordFromPoint: typeof import('/Users/jake/project/extension/lingo-crx/utils/wordExtractor').extractWordFromPoint
   const fakeBrowser: typeof import('wxt/testing').fakeBrowser
   const fetchDefinition: typeof import('/Users/jake/project/extension/lingo-crx/utils/deepseek').fetchDefinition
+  const fetchGeneralMeanings: typeof import('/Users/jake/project/extension/lingo-crx/utils/deepseek').fetchGeneralMeanings
   const getApiKey: typeof import('/Users/jake/project/extension/lingo-crx/utils/storage').getApiKey
   const getAppConfig: typeof import('wxt/utils/app-config').getAppConfig
   const injectScript: typeof import('wxt/utils/inject-script').injectScript
@@ -67,7 +68,7 @@ declare global {
   export type { MeaningState } from '/Users/jake/project/extension/lingo-crx/hooks/useWordMeaning'
   import('/Users/jake/project/extension/lingo-crx/hooks/useWordMeaning')
   // @ts-ignore
-  export type { DefinitionResult, DefinitionError, FetchDefinitionResult } from '/Users/jake/project/extension/lingo-crx/utils/deepseek'
+  export type { DefinitionResult, DefinitionError, GeneralMeaning, FetchDefinitionResult } from '/Users/jake/project/extension/lingo-crx/utils/deepseek'
   import('/Users/jake/project/extension/lingo-crx/utils/deepseek')
   // @ts-ignore
   export type { WordInfo } from '/Users/jake/project/extension/lingo-crx/utils/wordExtractor'
