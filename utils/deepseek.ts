@@ -1,6 +1,6 @@
 // utils/deepseek.ts
 
-const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 
 const SYSTEM_PROMPT = `你是词典助手。使命：让用户看懂单词在语境中的含义和用法。
 
@@ -71,7 +71,7 @@ export async function fetchDefinition(
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: sentence ? sentence : `查词: ${word}` },
         ],
-        max_tokens: 200,
+        response_format: { type: "json_object" },
         temperature: 0.3,
       }),
       signal,
