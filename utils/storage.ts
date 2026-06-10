@@ -1,6 +1,7 @@
 // utils/storage.ts
 
 const API_KEY_STORAGE_KEY = "deepseek-api-key";
+const REQUIRE_ALT_KEY_STORAGE_KEY = "require-alt-key";
 
 export async function getApiKey(): Promise<string | undefined> {
   const result = await chrome.storage.sync.get(API_KEY_STORAGE_KEY);
@@ -24,4 +25,13 @@ export async function onApiKeyChange(
   };
   chrome.storage.onChanged.addListener(listener);
   return () => chrome.storage.onChanged.removeListener(listener);
+}
+
+export async function getRequireAltKey(): Promise<boolean> {
+  const result = await chrome.storage.sync.get(REQUIRE_ALT_KEY_STORAGE_KEY);
+  return result[REQUIRE_ALT_KEY_STORAGE_KEY] !== false; // default true
+}
+
+export async function setRequireAltKey(value: boolean): Promise<void> {
+  await chrome.storage.sync.set({ [REQUIRE_ALT_KEY_STORAGE_KEY]: value });
 }

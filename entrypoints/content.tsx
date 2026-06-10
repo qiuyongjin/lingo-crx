@@ -1,10 +1,12 @@
 // entrypoints/content.ts
 
 import { createRoot } from "react-dom/client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { WordPopup } from "../components/WordPopup";
+import { SettingsPanel } from "../components/SettingsPanel";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
+import { getRequireAltKey } from "../utils/storage";
 import popupCss from "../styles/popup.scss?inline";
 
 export default defineContentScript({
@@ -68,20 +70,29 @@ export default defineContentScript({
       // Inline component bridging hook and presentational component
       function PopupApp() {
         const { state, lookup, reset } = useWordMeaning();
+        const [showSettings, setShowSettings] = useState(false);
 
         // Fire API lookup once on mount
         useEffect(() => {
           lookup(word, sentence);
         }, [word, sentence]);
 
+        if (showSettings) {
+          return (
+            <SettingsPanel
+              top={top}
+              left={left}
+              onBack={() => setShowSettings(false)}
+            />
+          );
+        }
+
         return (
           <WordPopup
             state={state}
             top={top}
             left={left}
-            onOpenSettings={() => {
-              window.open(chrome.runtime.getURL("options.html"), "_blank");
-            }}
+            onToggleSettings={() => setShowSettings(true)}
           />
         );
       }
@@ -115,16 +126,16 @@ export default defineContentScript({
       }
     }
 
-    // Global click listener — only triggers word lookup when Alt is held
+    // Global click listener — checks Alt key preference before lookup
     document.addEventListener(
       "click",
-      (e: MouseEvent) => {
+      async (e: MouseEvent) => {
         if (shadowContainer?.contains(e.target as Node)) return;
 
         unmountPopup();
 
-        // Only show popup when Alt (Option) key is held during click
-        if (!e.altKey) return;
+        const requireAlt = await getRequireAltKey();
+        if (requireAlt && !e.altKey) return;
 
         mountPopup(e.clientX, e.clientY);
       },

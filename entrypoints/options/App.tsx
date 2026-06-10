@@ -1,16 +1,18 @@
 // entrypoints/options/App.tsx
 
 import { useState, useEffect } from "react";
-import { getApiKey, setApiKey } from "../../utils/storage";
+import { getApiKey, setApiKey, getRequireAltKey, setRequireAltKey } from "../../utils/storage";
 
 export function App() {
   const [apiKey, setApiKeyState] = useState("");
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [requireAlt, setRequireAlt] = useState(true);
 
   useEffect(() => {
-    getApiKey().then((key) => {
+    Promise.all([getApiKey(), getRequireAltKey()]).then(([key, alt]) => {
       if (key) setApiKeyState(key);
+      setRequireAlt(alt);
       setLoading(false);
     });
   }, []);
@@ -118,6 +120,37 @@ export function App() {
       <button onClick={handleSave} style={buttonStyle}>
         {saved ? "✓ 已保存" : "保存"}
       </button>
+
+      <h2 style={{ ...headingStyle, fontSize: "16px", marginTop: "32px" }}>
+        偏好设置
+      </h2>
+
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          cursor: "pointer",
+          userSelect: "none",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={requireAlt}
+          onChange={async (e) => {
+            const checked = e.target.checked;
+            setRequireAlt(checked);
+            await setRequireAltKey(checked);
+          }}
+          style={{ width: "16px", height: "16px", cursor: "pointer" }}
+        />
+        <span style={{ fontSize: "14px", color: "#1e293b" }}>
+          需要按住 Option (Alt) 键点击单词
+        </span>
+      </label>
+      <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "6px", marginLeft: "26px", lineHeight: 1.5 }}>
+        关闭后，直接点击页面上的单词即可查词。
+      </p>
 
       <p style={hintStyle}>
         还没有 API Key？前往{" "}
