@@ -86,19 +86,10 @@
 .lingo-sentence {
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px dashed #e2e8f0;
   font-size: 11px;
   color: #94a3b8;
   font-style: italic;
-  word-break: break-word;
-}
-
-.lingo-debug {
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px dashed #cbd5e1;
-  font-size: 10px;
-  color: #cbd5e1;
   word-break: break-word;
 }
 

@@ -12,6 +12,8 @@ pnpm build          # Production build → dist/chrome-mv3/
 
 There are no tests or linter configured.
 
+After modifying code, always run `pnpm build` to rebuild the extension.
+
 ## Architecture
 
 This is a Chrome extension (Manifest V3) built with **WXT**. It has two entrypoints:
