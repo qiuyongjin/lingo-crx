@@ -70,9 +70,9 @@ export function WordPopup({
               <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
             </div>
           )}
-          {state.sentence && (
+          {/* {state.sentence && (
             <div className="lingo-sentence">{state.sentence}</div>
-          )}
+          )} */}
         </>
       )}
 
