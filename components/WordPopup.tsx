@@ -22,17 +22,20 @@ export function WordPopup({
       style={{ top: `${top}px`, left: `${left}px` }}
       data-testid="lingo-popup"
     >
+      {/* Word is always displayed, regardless of state */}
+      {"word" in state && (
+        <div className="lingo-word">{state.word}</div>
+      )}
+
       {state.status === "loading" && (
         <div className="lingo-loading">
           <LoadingSpinner />
-          <span>{state.word}</span>
           <span>查询中...</span>
         </div>
       )}
 
       {state.status === "result" && (
         <>
-          <div className="lingo-word">{state.word}</div>
           <div className="lingo-meaning">{state.meaning}</div>
           {state.generalMeanings && state.generalMeanings.length > 0 && (
             <div className="lingo-general-section">
