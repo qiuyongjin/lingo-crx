@@ -93,6 +93,49 @@
   word-break: break-word;
 }
 
+.lingo-general-section {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.lingo-general-item {
+  margin-bottom: 4px;
+}
+
+.lingo-general-item:last-child {
+  margin-bottom: 0;
+}
+
+.lingo-general-pos {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.lingo-general-pos-label {
+  font-weight: 600;
+  color: #64748b;
+  margin-right: 4px;
+}
+
+.lingo-general-meaning {
+  color: #475569;
+}
+
+.lingo-general-keyword {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-left: 3px;
+}
+
+.lingo-general-example {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+  margin-left: 8px;
+  line-height: 1.4;
+}
+
 /* Arrow pointer above the popup */
 .lingo-popup::after {
   content: "";
