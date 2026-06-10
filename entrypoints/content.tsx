@@ -155,13 +155,26 @@ export default defineContentScript({
       return false;
     }
 
+    // Timer for debouncing single-click vs double-click.
+    // When the user double-clicks, their intent is to select text, not lookup.
+    let clickTimer: ReturnType<typeof setTimeout> | null = null;
+
     // Global click listener — checks Alt key preference before lookup
     document.addEventListener(
       "click",
       async (e: MouseEvent) => {
         if (shadowContainer?.contains(e.target as Node)) return;
 
+        // Clear any pending single-click timer
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+        }
+
         unmountPopup();
+
+        // Ignore double-click — user intent is text selection, not word lookup
+        if (e.detail > 1) return;
 
         // Ignore clicks on links — user intent is navigation, not word lookup
         if (isNavigationalClick(e.target as Element)) return;
@@ -169,7 +182,12 @@ export default defineContentScript({
         const requireAlt = await getRequireAltKey();
         if (requireAlt && !e.altKey) return;
 
-        mountPopup(e.clientX, e.clientY);
+        // Debounce: delay lookup briefly so double-clicks cancel the timer.
+        // This prevents the popup from flashing on the first click of a double-click.
+        clickTimer = setTimeout(() => {
+          clickTimer = null;
+          mountPopup(e.clientX, e.clientY);
+        }, 300);
       },
       true
     );
