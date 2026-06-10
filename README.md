@@ -2,101 +2,28 @@
 
 点击网页中的任意单词，即可在单词下方悬浮显示中文释义。
 
-Lingo is a Chrome extension that shows brief Chinese definitions when you click any word on a webpage, powered by the DeepSeek API.
+## 功能
 
-## Features
+- **点击查词** — 在任意网页中点击单词，下方弹出中文释义
+- **AI 驱动** — 释义由 DeepSeek 大模型生成，准确简洁
+- **即点即显** — 无需划词、无需快捷键，点击即可
 
-- **Click to define** — Click any word on any page to see its definition
-- **AI-powered** — Definitions from DeepSeek large language model
-- **Shadow DOM isolation** — Popup styles never conflict with the host page
-- **Minimal & fast** — Brief one-line Chinese translations, no clutter
+## 安装使用
 
-## Tech Stack
+### 1. 安装扩展
 
-| Layer | Choice |
-|-------|--------|
-| Extension Framework | [WXT](https://wxt.dev) |
-| Language | TypeScript |
-| UI | React 19 |
-| Styling | CSS (Shadow DOM isolated) |
-| API | DeepSeek API (OpenAI-compatible) |
-| Package Manager | pnpm |
+1. 下载 `dist/chrome-mv3/` 目录
+2. 打开 Chrome，进入 `chrome://extensions`
+3. 开启右上角「开发者模式」
+4. 点击「加载已解压的扩展程序」
+5. 选择 `dist/chrome-mv3/` 目录
 
-## Getting Started
+### 2. 配置 API Key
 
-### Prerequisites
+1. 前往 [DeepSeek 开放平台](https://platform.deepseek.com/api_keys) 创建 API Key
+2. 右键点击扩展图标 → 选项（或点击扩展图标 → 设置）
+3. 粘贴 API Key，点击保存
 
-- Node.js 18+
-- pnpm
-- [DeepSeek API Key](https://platform.deepseek.com/api_keys)
+### 3. 开始使用
 
-### Install
-
-```bash
-pnpm install
-```
-
-### Develop
-
-```bash
-pnpm dev
-```
-
-This starts WXT in dev mode with HMR. Load the `dist/` directory as an unpacked extension in Chrome:
-
-1. Open `chrome://extensions`
-2. Enable "Developer mode"
-3. Click "Load unpacked"
-4. Select `dist/chrome-mv3/`
-
-### Build
-
-```bash
-pnpm build
-```
-
-Output is in `dist/chrome-mv3/`.
-
-### Configure
-
-After loading the extension:
-
-1. Go to the extension's Options page (right-click the extension icon → Options)
-2. Paste your DeepSeek API Key
-3. Click Save
-
-## How It Works
-
-```
-Click a word → Extract word at cursor → Call DeepSeek API → Show popup below word
-```
-
-- Content script listens for click events on all pages
-- `caretRangeFromPoint` extracts the exact word under the cursor
-- Shadow DOM renders a React popup isolated from the host page
-- `chrome.storage.sync` stores the API key securely
-- Click anywhere outside the popup to dismiss
-
-## Project Structure
-
-```
-src/
-├── entrypoints/
-│   ├── content.tsx          # Content script — click → popup
-│   └── options/             # API key settings page
-├── components/
-│   ├── WordPopup.tsx        # Definition popup (loading/result/error)
-│   └── LoadingSpinner.tsx   # Animated spinner
-├── hooks/
-│   └── useWordMeaning.ts    # API fetch + abort + state
-├── utils/
-│   ├── storage.ts           # chrome.storage wrappers
-│   ├── deepseek.ts          # DeepSeek API client
-│   └── wordExtractor.ts     # caretRangeFromPoint word extraction
-└── styles/
-    └── popup.css            # Shadow DOM isolated styles
-```
-
-## License
-
-MIT
+配置完成后，在任意网页中点击单词，释义即刻弹出。点击弹窗以外的区域即可关闭。
