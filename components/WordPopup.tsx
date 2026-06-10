@@ -22,7 +22,6 @@ export function WordPopup({
       style={{ top: `${top}px`, left: `${left}px` }}
       data-testid="lingo-popup"
     >
-      {/* Word is always displayed, regardless of state */}
       {"word" in state && (
         <div className="lingo-word">{state.word}</div>
       )}
