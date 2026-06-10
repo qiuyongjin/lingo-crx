@@ -1,5 +1,7 @@
 # Lingo
 
+[中文](README_CN.md)
+
 Click any word on a webpage to see its Chinese definition in a floating popup.
 
 ## Features
