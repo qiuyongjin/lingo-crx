@@ -1,23 +1,176 @@
-/* styles/popup.css */
+// styles/popup.scss — Sass refactor
+
+// ── Design Tokens ──────────────────────────────────────────────
+
+// Colors
+$color-bg:              #ffffff;
+$color-text-primary:    #1e293b;
+$color-text-secondary:  #475569;
+$color-text-tertiary:   #64748b;
+$color-text-muted:      #94a3b8;
+$color-accent:          #3b82f6;
+$color-error:           #ef4444;
+$color-warning:         #f59e0b;
+$color-border:          #e2e8f0;
+$color-shadow:          rgba(0, 0, 0, 0.15);
+
+// Typography
+$font-family-system:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                        "Helvetica Neue", Arial, sans-serif;
+$font-size-sm:          14px;
+$font-size-md:          16px;
+$font-weight-medium:    500;
+$font-weight-semibold:  600;
+$line-height-base:      1.5;
+
+// Spacing
+$spacing-2xs:           2px;
+$spacing-xs:            4px;
+$spacing-sm:            6px;
+$spacing-md:            8px;
+$spacing-lg:            10px;
+$spacing-xl:            14px;
+
+// Layout
+$popup-width:           300px;
+$popup-radius:          8px;
+$arrow-size:            6px;
+$separator:             1px dashed $color-border;
+
+// Animation
+$fade-duration:         0.15s;
+$spin-duration:         0.8s;
+
+// Z-index
+$z-max:                 2147483647;
+
+// ── Base ───────────────────────────────────────────────────────
 
 :host {
   all: initial;
 }
 
+// ── Popup Container ────────────────────────────────────────────
+
 .lingo-popup {
   position: absolute;
-  z-index: 2147483647;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-  width: 300px;
-  padding: 10px 14px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.5;
+  z-index: $z-max;
+  background: $color-bg;
+  border-radius: $popup-radius;
+  box-shadow: 0 2px 12px $color-shadow;
+  width: $popup-width;
+  padding: $spacing-lg $spacing-xl;
+  font-family: $font-family-system;
+  line-height: $line-height-base;
   pointer-events: auto;
-  animation: lingo-fade-in 0.15s ease-out;
+  animation: lingo-fade-in $fade-duration ease-out;
+
+  // Arrow pointer above the popup
+  &::after {
+    content: "";
+    position: absolute;
+    top: -$arrow-size;
+    left: 16px;
+    width: 0;
+    height: 0;
+    border-left: $arrow-size solid transparent;
+    border-right: $arrow-size solid transparent;
+    border-bottom: $arrow-size solid $color-bg;
+  }
 }
+
+// ── Content Sections ───────────────────────────────────────────
+
+.lingo-word {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2xs;
+}
+
+.lingo-meaning {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+// ── Context (phrase + translation) ─────────────────────────────
+
+.lingo-context {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: $separator;
+
+  &-phrase {
+    font-size: $font-size-sm;
+    color: $color-accent;
+    font-weight: $font-weight-medium;
+  }
+
+  &-translation {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    margin-top: $spacing-2xs;
+  }
+}
+
+// ── Loading State ──────────────────────────────────────────────
+
+.lingo-loading {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+}
+
+.lingo-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &-svg {
+    animation: lingo-spin $spin-duration linear infinite;
+  }
+}
+
+// ── Status States ──────────────────────────────────────────────
+
+.lingo-error {
+  font-size: $font-size-sm;
+  color: $color-error;
+}
+
+.lingo-no-key {
+  font-size: $font-size-sm;
+  color: $color-warning;
+}
+
+.lingo-settings-link {
+  color: $color-accent;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  margin-top: $spacing-xs;
+  display: inline-block;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ── Sentence Context ───────────────────────────────────────────
+
+.lingo-sentence {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: $separator;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  font-style: italic;
+  word-break: break-word;
+}
+
+// ── Keyframes ──────────────────────────────────────────────────
 
 @keyframes lingo-fade-in {
   from {
@@ -30,102 +183,8 @@
   }
 }
 
-.lingo-word {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 2px;
-}
-
-.lingo-meaning {
-  font-size: 14px;
-  color: #475569;
-}
-
-.lingo-context {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px dashed #e2e8f0;
-}
-
-.lingo-context-phrase {
-  font-size: 14px;
-  color: #3b82f6;
-  font-weight: 500;
-}
-
-.lingo-context-translation {
-  font-size: 14px;
-  color: #64748b;
-  margin-top: 2px;
-}
-
-.lingo-loading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #94a3b8;
-}
-
-.lingo-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.lingo-spinner-svg {
-  animation: lingo-spin 0.8s linear infinite;
-}
-
 @keyframes lingo-spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-.lingo-error {
-  font-size: 14px;
-  color: #ef4444;
-}
-
-.lingo-no-key {
-  font-size: 14px;
-  color: #f59e0b;
-}
-
-.lingo-settings-link {
-  color: #3b82f6;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 4px;
-  display: inline-block;
-}
-
-.lingo-settings-link:hover {
-  text-decoration: underline;
-}
-
-.lingo-sentence {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px dashed #e2e8f0;
-  font-size: 14px;
-  color: #94a3b8;
-  font-style: italic;
-  word-break: break-word;
-}
-
-/* Arrow pointer above the popup */
-.lingo-popup::after {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 16px;
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 6px solid #ffffff;
 }
