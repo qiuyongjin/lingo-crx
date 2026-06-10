@@ -136,6 +136,25 @@ export default defineContentScript({
       }
     }
 
+    // Check if click target is inside a navigational element (link, area).
+    // When the user clicks a link, their intent is navigation, not word lookup.
+    function isNavigationalClick(el: Element): boolean {
+      let current: Element | null = el;
+      while (current) {
+        const tag = current.tagName;
+        if (
+          (tag === "A" &&
+            (current as HTMLAnchorElement).hasAttribute("href")) ||
+          (tag === "AREA" &&
+            (current as HTMLAreaElement).hasAttribute("href"))
+        ) {
+          return true;
+        }
+        current = current.parentElement;
+      }
+      return false;
+    }
+
     // Global click listener — checks Alt key preference before lookup
     document.addEventListener(
       "click",
@@ -143,6 +162,9 @@ export default defineContentScript({
         if (shadowContainer?.contains(e.target as Node)) return;
 
         unmountPopup();
+
+        // Ignore clicks on links — user intent is navigation, not word lookup
+        if (isNavigationalClick(e.target as Element)) return;
 
         const requireAlt = await getRequireAltKey();
         if (requireAlt && !e.altKey) return;
