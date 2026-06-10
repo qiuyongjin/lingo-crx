@@ -18,4 +18,10 @@ declare module '#imports' {
   export { InvalidMatchPattern, MatchPattern } from 'wxt/utils/match-patterns';
   export { useState, useCallback, useMemo, useEffect, useRef, useContext, useReducer } from 'react';
   export { fakeBrowser } from 'wxt/testing';
+  export { LoadingSpinner } from '../components/LoadingSpinner';
+  export { WordPopup } from '../components/WordPopup';
+  export { useWordMeaning, MeaningState } from '../hooks/useWordMeaning';
+  export { fetchDefinition, DefinitionResult, DefinitionError, FetchDefinitionResult } from '../utils/deepseek';
+  export { getApiKey, setApiKey, onApiKeyChange } from '../utils/storage';
+  export { extractWordFromPoint, WordInfo } from '../utils/wordExtractor';
 }

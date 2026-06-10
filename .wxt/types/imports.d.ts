@@ -3,7 +3,9 @@ export {}
 declare global {
   const ContentScriptContext: typeof import('wxt/utils/content-script-context').ContentScriptContext
   const InvalidMatchPattern: typeof import('wxt/utils/match-patterns').InvalidMatchPattern
+  const LoadingSpinner: typeof import('/Users/jake/project/extension/lingo-crx/components/LoadingSpinner').LoadingSpinner
   const MatchPattern: typeof import('wxt/utils/match-patterns').MatchPattern
+  const WordPopup: typeof import('/Users/jake/project/extension/lingo-crx/components/WordPopup').WordPopup
   const browser: typeof import('wxt/browser').browser
   const createIframeUi: typeof import('wxt/utils/content-script-ui/iframe').createIframeUi
   const createIntegratedUi: typeof import('wxt/utils/content-script-ui/integrated').createIntegratedUi
@@ -13,9 +15,14 @@ declare global {
   const defineContentScript: typeof import('wxt/utils/define-content-script').defineContentScript
   const defineUnlistedScript: typeof import('wxt/utils/define-unlisted-script').defineUnlistedScript
   const defineWxtPlugin: typeof import('wxt/utils/define-wxt-plugin').defineWxtPlugin
+  const extractWordFromPoint: typeof import('/Users/jake/project/extension/lingo-crx/utils/wordExtractor').extractWordFromPoint
   const fakeBrowser: typeof import('wxt/testing').fakeBrowser
+  const fetchDefinition: typeof import('/Users/jake/project/extension/lingo-crx/utils/deepseek').fetchDefinition
+  const getApiKey: typeof import('/Users/jake/project/extension/lingo-crx/utils/storage').getApiKey
   const getAppConfig: typeof import('wxt/utils/app-config').getAppConfig
   const injectScript: typeof import('wxt/utils/inject-script').injectScript
+  const onApiKeyChange: typeof import('/Users/jake/project/extension/lingo-crx/utils/storage').onApiKeyChange
+  const setApiKey: typeof import('/Users/jake/project/extension/lingo-crx/utils/storage').setApiKey
   const storage: typeof import('wxt/utils/storage').storage
   const useAppConfig: typeof import('wxt/utils/app-config').useAppConfig
   const useCallback: typeof import('react').useCallback
@@ -25,6 +32,7 @@ declare global {
   const useReducer: typeof import('react').useReducer
   const useRef: typeof import('react').useRef
   const useState: typeof import('react').useState
+  const useWordMeaning: typeof import('/Users/jake/project/extension/lingo-crx/hooks/useWordMeaning').useWordMeaning
 }
 // for type re-export
 declare global {
@@ -55,4 +63,13 @@ declare global {
   // @ts-ignore
   export type { ScriptPublicPath, InjectScriptOptions } from 'wxt/utils/inject-script'
   import('wxt/utils/inject-script')
+  // @ts-ignore
+  export type { MeaningState } from '/Users/jake/project/extension/lingo-crx/hooks/useWordMeaning'
+  import('/Users/jake/project/extension/lingo-crx/hooks/useWordMeaning')
+  // @ts-ignore
+  export type { DefinitionResult, DefinitionError, FetchDefinitionResult } from '/Users/jake/project/extension/lingo-crx/utils/deepseek'
+  import('/Users/jake/project/extension/lingo-crx/utils/deepseek')
+  // @ts-ignore
+  export type { WordInfo } from '/Users/jake/project/extension/lingo-crx/utils/wordExtractor'
+  import('/Users/jake/project/extension/lingo-crx/utils/wordExtractor')
 }
