@@ -67,7 +67,7 @@ export async function fetchDefinition(
         model: "deepseek-v4-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: sentence ? `句子: ${sentence}` : `查词: ${word}` },
+          { role: "user", content: sentence ? sentence : `查词: ${word}` },
         ],
         max_tokens: 200,
         temperature: 0.3,
