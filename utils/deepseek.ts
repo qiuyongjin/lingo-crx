@@ -2,16 +2,23 @@
 
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
 
-const SYSTEM_PROMPT =
-  "你是一个词典助手。用户提供句子和{}标记的单词时，根据语境翻译该单词的准确中文释义。用户仅提供单词时，翻译该单词的常见中文释义。格式：仅输出释义本身，不要引号、标点或任何额外解释。";
+const SYSTEM_PROMPT = `你是词典助手。使命：让用户看懂单词在语境中的含义和用法。
 
-const GENERAL_PROMPT =
-  "你是一个词典助手。请针对单词输出其所有常见词性及对应释义，以JSON格式返回。\n" +
-  "格式：{\"meanings\":[{\"pos\":\"n.\",\"meaning\":\"中文释义\",\"keyword\":\"english keyword\",\"example\":\"example sentence\"},...]}\n\n" +
-  "要求：\n" +
-  "1. 忽略没有实际用法的词性\n" +
-  "2. 每个词性提供一个英文例句，需能体现该释义的用法\n" +
-  "3. 仅输出JSON，不要任何额外解释";
+用户提供句子时（{}标记的是目标词），从原文提取包含该词的短语/搭配，给出单词释义和短语翻译。让用户既理解单词意思，又看懂整个句子。
+
+格式自由，怎么清楚怎么来。善用" / "、"……"等符号。
+
+用户仅提供单词时，给出常见中文释义。
+
+仅输出翻译本身，不要任何解释。`;
+
+const GENERAL_PROMPT = `你是一个词典助手。请针对单词输出其所有常见词性及对应释义，以JSON格式返回。
+格式：{"meanings":[{"pos":"n.","meaning":"中文释义","keyword":"english keyword","example":"example sentence"},...]}
+
+要求：
+1. 忽略没有实际用法的词性
+2. 每个词性提供一个英文例句，需能体现该释义的用法
+3. 仅输出JSON，不要任何额外解释`;
 
 export interface DefinitionResult {
   word: string;
