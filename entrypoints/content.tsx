@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { WordPopup } from "../components/WordPopup";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
-import popupCss from "../styles/popup.css?inline";
+import popupCss from "../styles/popup.scss?inline";
 
 export default defineContentScript({
   matches: ["<all_urls>"],
