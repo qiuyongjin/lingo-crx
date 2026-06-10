@@ -1,6 +1,6 @@
 {
   "name": "lingo-crx",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Click any word to see its Chinese definition",
   "private": true,
   "scripts": {
