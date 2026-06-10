@@ -42,6 +42,24 @@
   color: #475569;
 }
 
+.lingo-context {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.lingo-context-phrase {
+  font-size: 14px;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.lingo-context-translation {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
 .lingo-loading {
   display: flex;
   align-items: center;

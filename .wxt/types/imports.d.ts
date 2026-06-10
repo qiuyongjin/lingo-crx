@@ -68,7 +68,7 @@ declare global {
   export type { MeaningState } from '/Users/jake/project/extension/lingo-crx/hooks/useWordMeaning'
   import('/Users/jake/project/extension/lingo-crx/hooks/useWordMeaning')
   // @ts-ignore
-  export type { DefinitionResult, DefinitionError, GeneralMeaning, FetchDefinitionResult } from '/Users/jake/project/extension/lingo-crx/utils/deepseek'
+  export type { ContextualMeaning, DefinitionResult, DefinitionError, GeneralMeaning, FetchDefinitionResult } from '/Users/jake/project/extension/lingo-crx/utils/deepseek'
   import('/Users/jake/project/extension/lingo-crx/utils/deepseek')
   // @ts-ignore
   export type { WordInfo } from '/Users/jake/project/extension/lingo-crx/utils/wordExtractor'

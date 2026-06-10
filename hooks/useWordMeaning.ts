@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getApiKey } from "../utils/storage";
-import { fetchDefinition, FetchDefinitionResult, fetchGeneralMeanings, GeneralMeaning } from "../utils/deepseek";
+import { fetchDefinition, FetchDefinitionResult, fetchGeneralMeanings, GeneralMeaning, ContextualMeaning } from "../utils/deepseek";
 
 export type MeaningState =
   | { status: "idle" }
   | { status: "loading"; word: string; sentence?: string | null }
-  | { status: "result"; word: string; meaning: string; sentence?: string | null; generalMeanings?: GeneralMeaning[] }
+  | { status: "result"; word: string; meaning: ContextualMeaning; sentence?: string | null; generalMeanings?: GeneralMeaning[] }
   | { status: "no-api-key" }
   | { status: "error"; word: string; error: string };
 
@@ -31,7 +31,7 @@ export function useWordMeaning() {
     abortRef.current = controller;
 
     const [contextResult, generalMeanings] = await Promise.all([
-      fetchDefinition(word, apiKey, sentence ?? undefined),
+      fetchDefinition(word, apiKey, sentence ?? undefined, controller.signal),
       fetchGeneralMeanings(word, apiKey, controller.signal).catch(() => [] as GeneralMeaning[]),
     ]);
 
