@@ -10,12 +10,20 @@ interface WordPopupProps {
   onOpenSettings: () => void;
 }
 
+function buildDebugPrompt(word: string, sentence?: string | null): string {
+  return sentence ? `句子: ${sentence}` : `查词: ${word}`;
+}
+
 export function WordPopup({
   state,
   top,
   left,
   onOpenSettings,
 }: WordPopupProps) {
+  const showDebug =
+    (state.status === "loading" || state.status === "result") &&
+    state.word;
+
   return (
     <div
       className="lingo-popup"
@@ -58,6 +66,12 @@ export function WordPopup({
           >
             前往设置 →
           </a>
+        </div>
+      )}
+
+      {showDebug && (
+        <div className="lingo-debug">
+          {buildDebugPrompt(state.word, state.sentence)}
         </div>
       )}
     </div>

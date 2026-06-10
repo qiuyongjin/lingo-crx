@@ -93,6 +93,15 @@
   word-break: break-word;
 }
 
+.lingo-debug {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 10px;
+  color: #cbd5e1;
+  word-break: break-word;
+}
+
 /* Arrow pointer above the popup */
 .lingo-popup::after {
   content: "";

@@ -97,8 +97,12 @@ function textOffsetInBlock(
 }
 
 /**
- * Extract the sentence containing the word from the containing block element.
- * Returns null if no sentence terminators are found (e.g., button text, list items).
+ * Extract the context surrounding the word from the containing block element.
+ * Three-tier fallback for robustness across any HTML structure:
+ *   1. Sentence extraction by terminators (. 。 ! ！ ? ？)
+ *   2. Context window (±100 chars) when no terminators found
+ *   3. Smart truncation: if >500 chars, center around the marked word
+ * Returns null only when no block ancestor or no text content is available.
  */
 function extractSentence(
   textNode: Node,
@@ -116,50 +120,83 @@ function extractSentence(
   const wordOffset = textOffsetInBlock(block, textNode, wordStart);
   if (wordOffset < 0 || wordOffset >= fullText.length) return null;
 
-  // Search left for sentence terminator
+  // ---- Tier 1: Search for sentence boundaries ----
   let sentStart = 0;
+  let foundLeft = false;
   for (let i = wordOffset - 1; i >= 0; i--) {
     if (SENTENCE_TERMINATOR.test(fullText[i])) {
       sentStart = i + 1;
+      foundLeft = true;
       break;
     }
   }
 
-  // Search right for sentence terminator
   let sentEnd = fullText.length;
+  let foundRight = false;
   for (let i = wordOffset + word.length; i < fullText.length; i++) {
     if (SENTENCE_TERMINATOR.test(fullText[i])) {
       sentEnd = i + 1; // include the terminator
+      foundRight = true;
       break;
     }
   }
 
-  // If no terminator on either side, no sentence structure — return null
-  if (sentStart === 0 && sentEnd === fullText.length) return null;
-
-  let sentence = fullText.substring(sentStart, sentEnd).trim();
-  if (!sentence) return null;
-
-  // Truncate if too long
-  if (sentence.length > 500) {
-    sentence = sentence.substring(0, 500);
+  // ---- Tier 2: Fallback to context window ----
+  if (!foundLeft && !foundRight) {
+    const CONTEXT_RADIUS = 100;
+    sentStart = Math.max(0, wordOffset - CONTEXT_RADIUS);
+    sentEnd = Math.min(fullText.length, wordOffset + word.length + CONTEXT_RADIUS);
   }
 
-  // Replace the word at its exact position with {word} markup
-  const wordPosInSentence = wordOffset - sentStart;
+  // ---- Build marked context ----
+  return buildMarkedContext(fullText, sentStart, sentEnd, wordOffset, word);
+}
+
+/**
+ * Extract, trim, truncate, and mark the target word with {} in a context string.
+ */
+function buildMarkedContext(
+  fullText: string,
+  start: number,
+  end: number,
+  wordOffset: number,
+  word: string
+): string | null {
+  const raw = fullText.substring(start, end);
+  let context = raw.trim();
+  if (!context) return null;
+
+  // Position of the word within the trimmed context
+  const leftTrim = raw.indexOf(context);
+  let wordPos = wordOffset - start - leftTrim;
+
+  // ---- Tier 3: Smart truncation, keeping the word centered ----
+  if (context.length > 500) {
+    const wordCenter = wordPos + word.length / 2;
+    const half = 250;
+    let truncStart = Math.max(0, Math.floor(wordCenter - half));
+    let truncEnd = Math.min(context.length, truncStart + 500);
+    if (truncEnd - truncStart < 500) {
+      truncStart = Math.max(0, truncEnd - 500);
+    }
+    context = context.substring(truncStart, truncEnd);
+    wordPos -= truncStart;
+  }
+
+  // Mark the target word with {}
   if (
-    wordPosInSentence >= 0 &&
-    wordPosInSentence + word.length <= sentence.length
+    wordPos >= 0 &&
+    wordPos + word.length <= context.length
   ) {
-    sentence =
-      sentence.substring(0, wordPosInSentence) +
+    context =
+      context.substring(0, wordPos) +
       "{" +
       word +
       "}" +
-      sentence.substring(wordPosInSentence + word.length);
+      context.substring(wordPos + word.length);
   }
 
-  return sentence;
+  return context;
 }
 
 function getCaretRangeFromPoint(x: number, y: number): Range | null {

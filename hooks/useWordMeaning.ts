@@ -6,7 +6,7 @@ import { fetchDefinition, FetchDefinitionResult } from "../utils/deepseek";
 
 export type MeaningState =
   | { status: "idle" }
-  | { status: "loading"; word: string }
+  | { status: "loading"; word: string; sentence?: string | null }
   | { status: "result"; word: string; meaning: string; sentence?: string | null }
   | { status: "no-api-key" }
   | { status: "error"; word: string; error: string };
@@ -25,7 +25,7 @@ export function useWordMeaning() {
       return;
     }
 
-    setState({ status: "loading", word });
+    setState({ status: "loading", word, sentence });
 
     const controller = new AbortController();
     abortRef.current = controller;
