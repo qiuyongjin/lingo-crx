@@ -50,7 +50,7 @@ export default defineContentScript({
       shadowContainer.style.left = "0";
       shadowContainer.style.width = "0";
       shadowContainer.style.height = "0";
-      shadowContainer.style.zIndex = "2147483647";
+      shadowContainer.style.zIndex = "999999";
 
       const shadowRoot = shadowContainer.attachShadow({ mode: "closed" });
 
