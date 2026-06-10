@@ -191,5 +191,45 @@ export default defineContentScript({
       },
       true
     );
+
+    // --- Ctrl-key word lookup ---
+
+    // Track mouse position so we know where the cursor is when Ctrl is released
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener("mousemove", (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // Detect Ctrl pressed alone (not as part of Ctrl+C, Ctrl+V, etc.)
+    let ctrlAlone = false;
+
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Control" && !e.repeat) {
+        ctrlAlone = true;
+      } else if (ctrlAlone) {
+        // Another key pressed while Ctrl is held — this is a combo, not alone
+        ctrlAlone = false;
+      }
+    });
+
+    document.addEventListener("keyup", (e: KeyboardEvent) => {
+      if (e.key !== "Control" || !ctrlAlone) return;
+      ctrlAlone = false;
+
+      // Skip if user is typing in an input/textarea/contenteditable
+      const active = document.activeElement;
+      if (
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        (active instanceof HTMLElement && active.isContentEditable)
+      ) {
+        return;
+      }
+
+      // Reuse existing popup logic at the last known cursor position
+      mountPopup(mouseX, mouseY);
+    });
   },
 });
