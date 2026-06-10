@@ -9,21 +9,23 @@ const SYSTEM_PROMPT = `你是词典助手。使命：让用户看懂单词在语
 ## 用户提供句子时（{}标记目标词）
 1. 从原文提取包含该词的短语/搭配
 2. 给出该词在此语境下的中文释义
-3. 翻译整个短语
+3. 给出该词的国际音标(IPA)注音
+4. 翻译整个短语
 
 JSON格式：
-{"meaning":"单词在语境中的中文释义","phrase":"原文短语","phraseMeaning":"短语的中文翻译"}
+{"meaning":"单词在语境中的中文释义","phonetic":"IPA音标，如 /ˈɪŋɡlɪʃ/","phrase":"原文短语","phraseMeaning":"短语的中文翻译"}
 
 ## 用户仅提供单词时
-只需返回 meaning 字段，phrase 和 phraseMeaning 可省略。
+只需返回 meaning 和 phonetic 字段，phrase 和 phraseMeaning 可省略。
 
 JSON格式：
-{"meaning":"常见中文释义"}
+{"meaning":"常见中文释义","phonetic":"IPA音标，如 /ˈɪŋɡlɪʃ/"}
 
 仅输出JSON，不要任何解释或额外文字。`;
 
 export interface ContextualMeaning {
   meaning: string;
+  phonetic: string;
   phrase: string;
   phraseMeaning: string;
 }
@@ -90,7 +92,7 @@ export async function fetchDefinition(
 
     const raw = data.choices?.[0]?.message?.content?.trim();
     if (!raw) {
-      return { word, meaning: { meaning: "未找到释义", phrase: "", phraseMeaning: "" } };
+      return { word, meaning: { meaning: "未找到释义", phonetic: "", phrase: "", phraseMeaning: "" } };
     }
 
     const json = stripJsonFences(raw);
@@ -120,6 +122,7 @@ export async function fetchDefinition(
       word,
       meaning: {
         meaning: typeof obj.meaning === "string" ? obj.meaning : "未找到释义",
+        phonetic: typeof obj.phonetic === "string" ? obj.phonetic : "",
         phrase: typeof obj.phrase === "string" ? obj.phrase : "",
         phraseMeaning: typeof obj.phraseMeaning === "string" ? obj.phraseMeaning : "",
       },

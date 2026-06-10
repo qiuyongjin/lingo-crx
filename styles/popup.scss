@@ -90,8 +90,14 @@ $z-max:                 999999;
   color: $color-text-primary;
   margin-bottom: $spacing-2xs;
 
-  span {
+  & > span {
     font-size: 20px;
+  }
+
+  .lingo-phonetic {
+    font-size: 14px;
+    font-weight: normal;
+    color: $color-text-muted;
   }
 }
 
