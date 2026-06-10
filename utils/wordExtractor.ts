@@ -29,8 +29,12 @@ export function extractWordFromPoint(x: number, y: number): WordInfo | null {
   const offset = range.startOffset;
   if (offset < 0 || offset > text.length) return null;
 
-  // Find word boundaries (supports Latin and CJK characters)
-  const wordRegex = /[\w一-鿿㐀-䶿]/u;
+  // Find word boundaries using Unicode-aware character classes.
+  // \p{L} = any letter (Latin, CJK, Cyrillic, Arabic, etc., including accented letters)
+  // \p{N} = any numeric digit
+  // Also treat hyphen and apostrophes as word-internal characters.
+  // ’ = ‘, ‘ = ‘ (curly/smart apostrophes), ‘ = ‘ (straight)
+  const wordRegex = /[\p{L}\p{N}_\-’‘’]/u;
   let start = offset;
   let end = offset;
 
@@ -44,7 +48,11 @@ export function extractWordFromPoint(x: number, y: number): WordInfo | null {
     end++;
   }
 
-  const word = text.slice(start, end).trim();
+  let word = text.slice(start, end);
+
+  // Strip leading/trailing hyphens and apostrophes (they're word-internal only)
+  word = word.replace(/^[\-''‘’]+|[\-''‘’]+$/g, "");
+
   if (!word || word.length === 0 || word.length > 50) return null;
 
   // Get bounding rect for the word
