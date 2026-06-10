@@ -83,6 +83,16 @@
   text-decoration: underline;
 }
 
+.lingo-sentence {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+  word-break: break-word;
+}
+
 /* Arrow pointer above the popup */
 .lingo-popup::after {
   content: "";

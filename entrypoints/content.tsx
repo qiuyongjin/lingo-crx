@@ -24,7 +24,7 @@ export default defineContentScript({
       const wordInfo = extractWordFromPoint(x, y);
       if (!wordInfo) return;
 
-      const word = wordInfo.word;
+      const { word, sentence } = wordInfo;
 
       // Calculate position: below the word, 6px gap
       let top = wordInfo.rect.bottom + 6 + window.scrollY;
@@ -74,7 +74,7 @@ export default defineContentScript({
         useEffect(() => {
           if (!startedRef.current) {
             startedRef.current = true;
-            lookup(word);
+            lookup(word, sentence);
           }
         }, [word]);
 
@@ -119,13 +119,17 @@ export default defineContentScript({
       }
     }
 
-    // Global click listener
+    // Global click listener — only triggers word lookup when Alt is held
     document.addEventListener(
       "click",
       (e: MouseEvent) => {
         if (shadowContainer?.contains(e.target as Node)) return;
 
         unmountPopup();
+
+        // Only show popup when Alt (Option) key is held during click
+        if (!e.altKey) return;
+
         mountPopup(e.clientX, e.clientY);
       },
       true

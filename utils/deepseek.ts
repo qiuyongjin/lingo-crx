@@ -3,7 +3,7 @@
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
 
 const SYSTEM_PROMPT =
-  "你是一个词典助手。只返回单词的简短中文释义，格式：'释义'，不要任何额外解释。";
+  "你是一个词典助手。用户提供句子和{}标记的单词时，根据语境翻译该单词的准确中文释义。用户仅提供单词时，翻译该单词的常见中文释义。格式：'释义'，不要任何额外解释。";
 
 export interface DefinitionResult {
   word: string;
@@ -20,7 +20,8 @@ export type FetchDefinitionResult = DefinitionResult | DefinitionError;
 
 export async function fetchDefinition(
   word: string,
-  apiKey: string
+  apiKey: string,
+  sentence?: string | null
 ): Promise<FetchDefinitionResult> {
   try {
     const response = await fetch(DEEPSEEK_API_URL, {
@@ -33,7 +34,7 @@ export async function fetchDefinition(
         model: "deepseek-chat",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: `查词: ${word}` },
+          { role: "user", content: sentence ? `句子: ${sentence}` : `查词: ${word}` },
         ],
         max_tokens: 80,
         temperature: 0.3,

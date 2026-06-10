@@ -34,6 +34,9 @@ export function WordPopup({
         <>
           <div className="lingo-word">{state.word}</div>
           <div className="lingo-meaning">{state.meaning}</div>
+          {state.sentence && (
+            <div className="lingo-sentence">{state.sentence}</div>
+          )}
         </>
       )}
 
