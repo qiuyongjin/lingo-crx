@@ -17,6 +17,7 @@ export default defineContentScript({
     let shadowContainer: HTMLDivElement | null = null;
     let reactRoot: ReturnType<typeof createRoot> | null = null;
     let outsideClickListener: ((e: MouseEvent) => void) | null = null;
+    let escapeKeyListener: ((e: KeyboardEvent) => void) | null = null;
 
     function mountPopup(x: number, y: number) {
       // Remove existing popup first
@@ -119,12 +120,24 @@ export default defineContentScript({
       setTimeout(() => {
         document.addEventListener("click", outsideClickListener!, true);
       }, 0);
+
+      // Dismiss popup on Escape key
+      escapeKeyListener = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          unmountPopup();
+        }
+      };
+      document.addEventListener("keydown", escapeKeyListener);
     }
 
     function unmountPopup() {
       if (outsideClickListener) {
         document.removeEventListener("click", outsideClickListener, true);
         outsideClickListener = null;
+      }
+      if (escapeKeyListener) {
+        document.removeEventListener("keydown", escapeKeyListener);
+        escapeKeyListener = null;
       }
       if (reactRoot) {
         reactRoot.unmount();
