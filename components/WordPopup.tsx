@@ -42,20 +42,6 @@ export function WordPopup({
               <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
             </div>
           )}
-          {state.generalMeanings && state.generalMeanings.length > 0 && (
-            <div className="lingo-general-section">
-              {state.generalMeanings.map((gm, i) => (
-                <div key={i} className="lingo-general-item">
-                  <div className="lingo-general-pos">
-                    <span className="lingo-general-pos-label">{gm.pos}</span>
-                    <span className="lingo-general-meaning">{gm.meaning}</span>
-                    <span className="lingo-general-keyword">({gm.keyword})</span>
-                  </div>
-                  <div className="lingo-general-example">{gm.example}</div>
-                </div>
-              ))}
-            </div>
-          )}
           {state.sentence && (
             <div className="lingo-sentence">{state.sentence}</div>
           )}

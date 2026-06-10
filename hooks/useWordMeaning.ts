@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getApiKey } from "../utils/storage";
-import { fetchDefinition, FetchDefinitionResult, fetchGeneralMeanings, GeneralMeaning, ContextualMeaning } from "../utils/deepseek";
+import { fetchDefinition, FetchDefinitionResult, ContextualMeaning } from "../utils/deepseek";
 
 export type MeaningState =
   | { status: "idle" }
   | { status: "loading"; word: string; sentence?: string | null }
-  | { status: "result"; word: string; meaning: ContextualMeaning; sentence?: string | null; generalMeanings?: GeneralMeaning[] }
+  | { status: "result"; word: string; meaning: ContextualMeaning; sentence?: string | null }
   | { status: "no-api-key" }
   | { status: "error"; word: string; error: string };
 
@@ -30,10 +30,7 @@ export function useWordMeaning() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    const [contextResult, generalMeanings] = await Promise.all([
-      fetchDefinition(word, apiKey, sentence ?? undefined, controller.signal),
-      fetchGeneralMeanings(word, apiKey, controller.signal).catch(() => [] as GeneralMeaning[]),
-    ]);
+    const contextResult = await fetchDefinition(word, apiKey, sentence ?? undefined, controller.signal);
 
     // Don't update state if this request was aborted
     if (controller.signal.aborted) return;
@@ -44,7 +41,6 @@ export function useWordMeaning() {
         word: contextResult.word,
         meaning: contextResult.meaning,
         sentence,
-        generalMeanings: generalMeanings.length > 0 ? generalMeanings : undefined,
       });
     } else {
       setState({ status: "error", word: contextResult.word, error: contextResult.error });

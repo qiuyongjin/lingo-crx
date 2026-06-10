@@ -22,14 +22,6 @@ JSON格式：
 
 仅输出JSON，不要任何解释或额外文字。`;
 
-const GENERAL_PROMPT = `你是一个词典助手。请针对单词输出其所有常见词性及对应释义，以JSON格式返回。
-格式：{"meanings":[{"pos":"n.","meaning":"中文释义","keyword":"english keyword","example":"example sentence"},...]}
-
-要求：
-1. 忽略没有实际用法的词性
-2. 每个词性提供一个英文例句，需能体现该释义的用法
-3. 仅输出JSON，不要任何额外解释`;
-
 export interface ContextualMeaning {
   meaning: string;
   phrase: string;
@@ -45,13 +37,6 @@ export interface DefinitionError {
   word: string;
   error: string;
   code: "NO_API_KEY" | "API_ERROR" | "NETWORK_ERROR";
-}
-
-export interface GeneralMeaning {
-  pos: string;
-  meaning: string;
-  keyword: string;
-  example: string;
 }
 
 export type FetchDefinitionResult = DefinitionResult | DefinitionError;
@@ -148,52 +133,5 @@ export async function fetchDefinition(
         ? "网络连接失败，请检查网络"
         : `请求出错: ${err instanceof Error ? err.message : String(err)}`;
     return { word, error: message, code: "NETWORK_ERROR" };
-  }
-}
-
-export async function fetchGeneralMeanings(
-  word: string,
-  apiKey: string,
-  signal?: AbortSignal
-): Promise<GeneralMeaning[]> {
-  try {
-    const response = await fetch(DEEPSEEK_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          { role: "system", content: GENERAL_PROMPT },
-          { role: "user", content: `查词: ${word}` },
-        ],
-        max_tokens: 300,
-        temperature: 0.3,
-      }),
-      signal,
-    });
-
-    if (!response.ok) {
-      return [];
-    }
-
-    const data = (await response.json()) as {
-      choices: Array<{ message: { content: string } }>;
-    };
-
-    const raw = data.choices?.[0]?.message?.content?.trim();
-    if (!raw) return [];
-
-    const json = stripJsonFences(raw);
-
-    const parsed = JSON.parse(json);
-    if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed) && Array.isArray((parsed as Record<string, unknown>).meanings)) {
-      return (parsed as Record<string, unknown>).meanings as GeneralMeaning[];
-    }
-    return [];
-  } catch {
-    return [];
   }
 }

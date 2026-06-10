@@ -21,7 +21,7 @@ declare module '#imports' {
   export { LoadingSpinner } from '../components/LoadingSpinner';
   export { WordPopup } from '../components/WordPopup';
   export { useWordMeaning, MeaningState } from '../hooks/useWordMeaning';
-  export { fetchDefinition, fetchGeneralMeanings, ContextualMeaning, DefinitionResult, DefinitionError, GeneralMeaning, FetchDefinitionResult } from '../utils/deepseek';
+  export { fetchDefinition, ContextualMeaning, DefinitionResult, DefinitionError, FetchDefinitionResult } from '../utils/deepseek';
   export { getApiKey, setApiKey, onApiKeyChange } from '../utils/storage';
   export { extractWordFromPoint, WordInfo } from '../utils/wordExtractor';
 }
