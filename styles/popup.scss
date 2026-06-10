@@ -82,10 +82,17 @@ $z-max:                 999999;
 // ── Content Sections ───────────────────────────────────────────
 
 .lingo-word {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
   margin-bottom: $spacing-2xs;
+
+  span {
+    font-size: 20px;
+  }
 }
 
 .lingo-meaning {
@@ -101,6 +108,9 @@ $z-max:                 999999;
   border-top: $separator;
 
   &-phrase {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
     font-size: $font-size-sm;
     color: $color-accent;
     font-weight: $font-weight-medium;
@@ -156,6 +166,40 @@ $z-max:                 999999;
   &:hover {
     text-decoration: underline;
   }
+}
+
+// ── Speak Button ──────────────────────────────────────────────
+
+.lingo-speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: $color-text-tertiary;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    color: $color-accent;
+    background: rgba($color-accent, 0.08);
+  }
+
+  &--active {
+    color: $color-accent;
+    background: rgba($color-accent, 0.12);
+    animation: lingo-pulse 1s ease-in-out infinite;
+  }
+}
+
+@keyframes lingo-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
 }
 
 // ── Sentence Context ───────────────────────────────────────────

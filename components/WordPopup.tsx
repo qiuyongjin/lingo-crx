@@ -2,6 +2,7 @@
 
 import { MeaningState } from "../hooks/useWordMeaning";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { SpeakButton } from "./SpeakButton";
 
 interface WordPopupProps {
   state: MeaningState;
@@ -23,7 +24,10 @@ export function WordPopup({
       data-testid="lingo-popup"
     >
       {"word" in state && (
-        <div className="lingo-word">{state.word}</div>
+        <div className="lingo-word">
+          <span>{state.word}</span>
+          <SpeakButton word={state.word} />
+        </div>
       )}
 
       {state.status === "loading" && (
@@ -38,7 +42,10 @@ export function WordPopup({
           <div className="lingo-meaning">{state.meaning.meaning}</div>
           {state.meaning.phrase && (
             <div className="lingo-context">
-              <div className="lingo-context-phrase">{state.meaning.phrase}</div>
+              <div className="lingo-context-phrase">
+              <span>{state.meaning.phrase}</span>
+              <SpeakButton word={state.meaning.phrase} />
+            </div>
               <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
             </div>
           )}
