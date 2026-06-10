@@ -53,6 +53,19 @@ export function extractWordFromPoint(x: number, y: number): WordInfo | null {
   wordRange.setEnd(node, end);
   const rect = wordRange.getBoundingClientRect();
 
+  // Guard: if the click point is far from the word's bounding rect,
+  // the user clicked on blank space and caretRangeFromPoint just found
+  // a nearby text node. Skip to avoid spurious API calls.
+  const CLICK_TOLERANCE = 6;
+  if (
+    x < rect.left - CLICK_TOLERANCE ||
+    x > rect.right + CLICK_TOLERANCE ||
+    y < rect.top - CLICK_TOLERANCE ||
+    y > rect.bottom + CLICK_TOLERANCE
+  ) {
+    return null;
+  }
+
   // Extract surrounding sentence
   const sentence = extractSentence(node, start, end, word);
 
