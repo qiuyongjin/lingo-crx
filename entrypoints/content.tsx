@@ -1,7 +1,7 @@
 // entrypoints/content.ts
 
 import { createRoot } from "react-dom/client";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { WordPopup } from "../components/WordPopup";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
@@ -70,13 +70,9 @@ export default defineContentScript({
         const { state, lookup, reset } = useWordMeaning();
 
         // Fire API lookup once on mount
-        const startedRef = useRef(false);
         useEffect(() => {
-          if (!startedRef.current) {
-            startedRef.current = true;
-            lookup(word, sentence);
-          }
-        }, [word]);
+          lookup(word, sentence);
+        }, [word, sentence]);
 
         return (
           <WordPopup
