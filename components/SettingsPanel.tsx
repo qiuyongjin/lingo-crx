@@ -1,7 +1,7 @@
 // components/SettingsPanel.tsx
 
 import { useState, useEffect } from "react";
-import { getRequireAltKey, setRequireAltKey } from "../utils/storage";
+import { getRequireAltKey, setRequireAltKey, getAutoSpeak, setAutoSpeak } from "../utils/storage";
 
 interface SettingsPanelProps {
   top: number;
@@ -11,11 +11,13 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ top, left, onBack }: SettingsPanelProps) {
   const [requireAlt, setRequireAlt] = useState(true);
+  const [autoSpeak, setAutoSpeakState] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    getRequireAltKey().then((val) => {
-      setRequireAlt(val);
+    Promise.all([getRequireAltKey(), getAutoSpeak()]).then(([alt, speak]) => {
+      setRequireAlt(alt);
+      setAutoSpeakState(speak);
       setLoaded(true);
     });
   }, []);
@@ -75,6 +77,24 @@ export function SettingsPanel({ top, left, onBack }: SettingsPanelProps) {
       </label>
       <p className="lingo-settings-hint">
         关闭后，直接点击页面上的单词即可查词。
+      </p>
+
+      <label className="lingo-settings-toggle">
+        <input
+          type="checkbox"
+          checked={autoSpeak}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            setAutoSpeakState(checked);
+            setAutoSpeak(checked);
+          }}
+        />
+        <span className="lingo-settings-toggle-label">
+          查出单词后自动朗读发音
+        </span>
+      </label>
+      <p className="lingo-settings-hint">
+        开启后，查词时自动朗读单词。
       </p>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { WordPopup } from "../components/WordPopup";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
-import { getRequireAltKey } from "../utils/storage";
+import { getRequireAltKey, getAutoSpeak } from "../utils/storage";
 import popupCss from "../styles/popup.scss?inline";
 
 export default defineContentScript({
@@ -27,6 +27,16 @@ export default defineContentScript({
       if (!wordInfo) return;
 
       const { word, sentence } = wordInfo;
+
+      // Auto-speak the word immediately if preference is enabled
+      getAutoSpeak().then((enabled) => {
+        if (enabled && window.speechSynthesis) {
+          const utterance = new SpeechSynthesisUtterance(word);
+          utterance.lang = "en-US";
+          utterance.rate = 0.9;
+          window.speechSynthesis.speak(utterance);
+        }
+      });
 
       // Calculate position: below the word, 6px gap
       let top = wordInfo.rect.bottom + 6 + window.scrollY;

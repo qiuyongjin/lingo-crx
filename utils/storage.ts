@@ -2,6 +2,7 @@
 
 const API_KEY_STORAGE_KEY = "deepseek-api-key";
 const REQUIRE_ALT_KEY_STORAGE_KEY = "require-alt-key";
+const AUTO_SPEAK_STORAGE_KEY = "auto-speak";
 
 export async function getApiKey(): Promise<string | undefined> {
   const result = await chrome.storage.sync.get(API_KEY_STORAGE_KEY);
@@ -34,4 +35,13 @@ export async function getRequireAltKey(): Promise<boolean> {
 
 export async function setRequireAltKey(value: boolean): Promise<void> {
   await chrome.storage.sync.set({ [REQUIRE_ALT_KEY_STORAGE_KEY]: value });
+}
+
+export async function getAutoSpeak(): Promise<boolean> {
+  const result = await chrome.storage.sync.get(AUTO_SPEAK_STORAGE_KEY);
+  return result[AUTO_SPEAK_STORAGE_KEY] === true; // default false
+}
+
+export async function setAutoSpeak(value: boolean): Promise<void> {
+  await chrome.storage.sync.set({ [AUTO_SPEAK_STORAGE_KEY]: value });
 }

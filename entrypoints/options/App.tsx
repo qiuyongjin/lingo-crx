@@ -1,18 +1,20 @@
 // entrypoints/options/App.tsx
 
 import { useState, useEffect } from "react";
-import { getApiKey, setApiKey, getRequireAltKey, setRequireAltKey } from "../../utils/storage";
+import { getApiKey, setApiKey, getRequireAltKey, setRequireAltKey, getAutoSpeak, setAutoSpeak } from "../../utils/storage";
 
 export function App() {
   const [apiKey, setApiKeyState] = useState("");
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [requireAlt, setRequireAlt] = useState(true);
+  const [autoSpeak, setAutoSpeakState] = useState(false);
 
   useEffect(() => {
-    Promise.all([getApiKey(), getRequireAltKey()]).then(([key, alt]) => {
+    Promise.all([getApiKey(), getRequireAltKey(), getAutoSpeak()]).then(([key, alt, speak]) => {
       if (key) setApiKeyState(key);
       setRequireAlt(alt);
+      setAutoSpeakState(speak);
       setLoading(false);
     });
   }, []);
@@ -150,6 +152,34 @@ export function App() {
       </label>
       <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "6px", marginLeft: "26px", lineHeight: 1.5 }}>
         关闭后，直接点击页面上的单词即可查词。
+      </p>
+
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          cursor: "pointer",
+          userSelect: "none",
+          marginTop: "16px",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={autoSpeak}
+          onChange={async (e) => {
+            const checked = e.target.checked;
+            setAutoSpeakState(checked);
+            await setAutoSpeak(checked);
+          }}
+          style={{ width: "16px", height: "16px", cursor: "pointer" }}
+        />
+        <span style={{ fontSize: "14px", color: "#1e293b" }}>
+          查出单词后自动朗读发音
+        </span>
+      </label>
+      <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "6px", marginLeft: "26px", lineHeight: 1.5 }}>
+        开启后，查词时自动朗读单词。
       </p>
 
       <p style={hintStyle}>
