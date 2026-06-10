@@ -1,29 +1,29 @@
 # Lingo
 
-点击网页中的任意单词，即可在单词下方悬浮显示中文释义。
+Click any word on a webpage to see its Chinese definition in a floating popup.
 
-## 功能
+## Features
 
-- **点击查词** — 在任意网页中点击单词，下方弹出中文释义
-- **AI 驱动** — 释义由 DeepSeek 大模型生成，准确简洁
-- **即点即显** — 无需划词、无需快捷键，点击即可
+- **Click to define** — Click any word on any page, definition pops up below
+- **AI-powered** — Accurate, concise definitions from DeepSeek
+- **Instant** — No text selection or keyboard shortcuts needed
 
-## 安装使用
+## Setup
 
-### 1. 安装扩展
+### 1. Install
 
-1. 下载 `dist/chrome-mv3/` 目录
-2. 打开 Chrome，进入 `chrome://extensions`
-3. 开启右上角「开发者模式」
-4. 点击「加载已解压的扩展程序」
-5. 选择 `dist/chrome-mv3/` 目录
+1. Download the `dist/chrome-mv3/` folder
+2. Open Chrome and go to `chrome://extensions`
+3. Enable "Developer mode" (top right)
+4. Click "Load unpacked"
+5. Select the `dist/chrome-mv3/` folder
 
-### 2. 配置 API Key
+### 2. Configure API Key
 
-1. 前往 [DeepSeek 开放平台](https://platform.deepseek.com/api_keys) 创建 API Key
-2. 右键点击扩展图标 → 选项（或点击扩展图标 → 设置）
-3. 粘贴 API Key，点击保存
+1. Get an API Key from [DeepSeek Platform](https://platform.deepseek.com/api_keys)
+2. Right-click the extension icon → Options
+3. Paste your API Key and click Save
 
-### 3. 开始使用
+### 3. Use
 
-配置完成后，在任意网页中点击单词，释义即刻弹出。点击弹窗以外的区域即可关闭。
+Click any word on any webpage — the definition appears instantly. Click outside the popup to dismiss.
