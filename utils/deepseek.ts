@@ -3,7 +3,7 @@
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
 
 const SYSTEM_PROMPT =
-  "你是一个词典助手。用户提供句子和{}标记的单词时，根据语境翻译该单词的准确中文释义。用户仅提供单词时，翻译该单词的常见中文释义。格式：'释义'，不要任何额外解释。";
+  "你是一个词典助手。用户提供句子和{}标记的单词时，根据语境翻译该单词的准确中文释义。用户仅提供单词时，翻译该单词的常见中文释义。格式：仅输出释义本身，不要引号、标点或任何额外解释。";
 
 export interface DefinitionResult {
   word: string;
