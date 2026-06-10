@@ -54,7 +54,7 @@ export function WordPopup({
       {state.status === "loading" && (
         <div className="lingo-loading">
           <LoadingSpinner />
-          <span>查询中...</span>
+          <span>Thinking...</span>
         </div>
       )}
 
