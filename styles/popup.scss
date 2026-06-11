@@ -271,14 +271,7 @@ $z-max:                 999999;
   &-translation {
     font-size: 13px;
     color: $color-text-tertiary;
-    padding-left: $spacing-md;
     word-break: break-word;
-    position: relative;
-
-    &::before {
-      content: "→ ";
-      color: $color-text-muted;
-    }
   }
 }
 
