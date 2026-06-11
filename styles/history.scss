@@ -27,27 +27,12 @@ $spacing-md:            8px;
 $spacing-lg:            10px;
 $spacing-xl:            14px;
 
-$panel-width:           320px;
 $fade-duration:         0.2s;
 
 // ── Base ───────────────────────────────────────────────────────
 
 :host {
   all: initial;
-}
-
-// ── Wrapper (covers full viewport so panel background overlay works) ─
-
-.lingo-history-root {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 99998;
-  font-family: $font-family-system;
-  line-height: $line-height-base;
 }
 
 // ── Floating Button ────────────────────────────────────────────
@@ -88,31 +73,14 @@ $fade-duration:         0.2s;
   }
 }
 
-// ── Panel Overlay (click to dismiss) ───────────────────────────
-
-.lingo-history-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  pointer-events: auto;
-  animation: lingo-history-fade-in $fade-duration ease-out;
-}
-
 // ── Panel ──────────────────────────────────────────────────────
 
 .lingo-history-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: $panel-width;
+  width: 100%;
   height: 100vh;
   background: $color-bg;
-  box-shadow: -2px 0 12px $color-shadow;
   display: flex;
   flex-direction: column;
-  pointer-events: auto;
-  animation: lingo-history-slide-in 0.25s ease-out;
-  z-index: 1;
 }
 
 // ── Panel Header ───────────────────────────────────────────────
@@ -210,22 +178,3 @@ $fade-duration:         0.2s;
   color: $color-text-muted;
 }
 
-// ── Animations ─────────────────────────────────────────────────
-
-@keyframes lingo-history-slide-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes lingo-history-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
