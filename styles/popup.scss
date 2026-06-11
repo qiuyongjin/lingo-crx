@@ -282,6 +282,27 @@ $z-max:                 999999;
   }
 }
 
+// ── Segments Loading State ──────────────────────────────────────
+
+.lingo-segments-loading {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  font-size: 13px;
+  color: $color-text-muted;
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: $separator;
+}
+
+.lingo-segments-error {
+  font-size: 13px;
+  color: $color-error;
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: $separator;
+}
+
 // ── Settings Panel ────────────────────────────────────────────
 
 .lingo-settings {

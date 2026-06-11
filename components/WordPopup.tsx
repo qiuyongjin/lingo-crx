@@ -73,7 +73,16 @@ export function WordPopup({
               <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
             </div>
           )}
-          {state.meaning.segments && state.meaning.segments.length > 0 && (
+          {state.segmentsLoading && (
+            <div className="lingo-segments-loading">
+              <LoadingSpinner />
+              <span>拆分句子...</span>
+            </div>
+          )}
+          {state.segmentsError && (
+            <div className="lingo-segments-error">{state.segmentsError}</div>
+          )}
+          {!state.segmentsLoading && state.meaning.segments && state.meaning.segments.length > 0 && (
             <div className="lingo-segments">
               {state.meaning.segments.map((seg, i) => (
                 <div key={i} className="lingo-segment">

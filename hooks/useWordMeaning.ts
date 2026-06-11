@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getApiKey } from "../utils/storage";
-import { fetchDefinition, FetchDefinitionResult, ContextualMeaning } from "../utils/deepseek";
+import { fetchDefinition, fetchSegments, ContextualMeaning } from "../utils/deepseek";
 
 export type MeaningState =
   | { status: "idle" }
   | { status: "loading"; word: string; sentence?: string | null }
-  | { status: "result"; word: string; meaning: ContextualMeaning; sentence?: string | null }
+  | { status: "result"; word: string; meaning: ContextualMeaning; sentence?: string | null; segmentsLoading: boolean; segmentsError?: string }
   | { status: "no-api-key" }
   | { status: "error"; word: string; error: string };
 
@@ -30,9 +30,17 @@ export function useWordMeaning() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    const contextResult = await fetchDefinition(word, apiKey, sentence ?? undefined, controller.signal);
+    const hasSentence = !!sentence;
 
-    // Don't update state if this request was aborted
+    // Fire both requests concurrently — definition and segments are independent
+    const defPromise = fetchDefinition(word, apiKey, sentence ?? undefined, controller.signal);
+    const segPromise = hasSentence
+      ? fetchSegments(sentence, apiKey, controller.signal)
+      : null;
+
+    // Wait for definition first to transition from loading → result
+    const contextResult = await defPromise;
+
     if (controller.signal.aborted) return;
 
     if ("meaning" in contextResult) {
@@ -41,7 +49,35 @@ export function useWordMeaning() {
         word: contextResult.word,
         meaning: contextResult.meaning,
         sentence,
+        segmentsLoading: hasSentence,
       });
+
+      // Await segments (already in-flight; may resolve immediately if it finished first)
+      if (segPromise) {
+        const segmentsResult = await segPromise;
+
+        if (controller.signal.aborted) return;
+
+        if ("segments" in segmentsResult) {
+          setState((prev) => {
+            if (prev.status === "result") {
+              return {
+                ...prev,
+                meaning: { ...prev.meaning, segments: segmentsResult.segments },
+                segmentsLoading: false,
+              };
+            }
+            return prev;
+          });
+        } else {
+          setState((prev) => {
+            if (prev.status === "result") {
+              return { ...prev, segmentsLoading: false, segmentsError: segmentsResult.error };
+            }
+            return prev;
+          });
+        }
+      }
     } else {
       setState({ status: "error", word: contextResult.word, error: contextResult.error });
     }
