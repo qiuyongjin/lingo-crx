@@ -30,5 +30,10 @@ export function useHistory() {
     setItems([]);
   }, []);
 
-  return { items, loading, addItem, clearAll } as const;
+  const reload = useCallback(async () => {
+    const updated = await getHistory();
+    setItems(updated);
+  }, []);
+
+  return { items, loading, addItem, clearAll, reload } as const;
 }

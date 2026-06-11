@@ -1,0 +1,53 @@
+<h2>悬浮按钮位置</h2>
+<p class="subtitle">按钮固定显示在页面上，点击打开历史面板。哪种位置最合适？</p>
+
+<div style="background: #f8fafc; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+  <p style="margin: 0 0 8px 0; font-weight: 600;">考虑因素：</p>
+  <ul style="margin: 0; font-size: 14px; color: #475569;">
+    <li>不能遮挡页面主要内容</li>
+    <li>容易发现，但不打扰阅读</li>
+    <li>适合不同页面布局（包括移动端缩放）</li>
+  </ul>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="right-middle" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>右侧中部</h3>
+      <p>固定在页面右侧垂直居中位置。最常见的悬浮按钮位置，类似回到顶部按钮的镜像位置。</p>
+      <div style="background: #e2e8f0; height: 120px; border-radius: 4px; margin-top: 8px; position: relative; overflow: hidden;">
+        <div style="position: absolute; left: 12px; top: 12px; right: 12px; height: 14px; background: #cbd5e1; border-radius: 2px;"></div>
+        <div style="position: absolute; left: 12px; top: 34px; right: 12px; height: 8px; background: #e2e8f0; border-radius: 1px;"></div>
+        <div style="position: absolute; left: 12px; top: 50px; right: 12px; height: 8px; background: #e2e8f0; border-radius: 1px;"></div>
+        <div style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: #3b82f6; border-radius: 50%;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="right-bottom" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>右下角</h3>
+      <p>固定在页面右下角，类似聊天客服按钮。最不干扰阅读，但可能与其他网站的浮动元素冲突。</p>
+      <div style="background: #e2e8f0; height: 120px; border-radius: 4px; margin-top: 8px; position: relative; overflow: hidden;">
+        <div style="position: absolute; left: 12px; top: 12px; right: 12px; height: 14px; background: #cbd5e1; border-radius: 2px;"></div>
+        <div style="position: absolute; left: 12px; top: 34px; right: 12px; height: 8px; background: #e2e8f0; border-radius: 1px;"></div>
+        <div style="position: absolute; left: 12px; top: 50px; right: 12px; height: 8px; background: #e2e8f0; border-radius: 1px;"></div>
+        <div style="position: absolute; right: 12px; bottom: 12px; width: 32px; height: 32px; background: #3b82f6; border-radius: 50%;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="left-middle" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>左侧中部</h3>
+      <p>固定在页面左侧垂直居中。与面板在右侧搭配时视觉平衡好，左侧按钮 → 右侧面板。</p>
+      <div style="background: #e2e8f0; height: 120px; border-radius: 4px; margin-top: 8px; position: relative; overflow: hidden;">
+        <div style="position: absolute; left: 12px; top: 12px; right: 12px; height: 14px; background: #cbd5e1; border-radius: 2px;"></div>
+        <div style="position: absolute; left: 12px; top: 34px; right: 12px; height: 8px; background: #e2e8f0; border-radius: 1px;"></div>
+        <div style="position: absolute; left: 12px; top: 50px; right: 12px; height: 8px; background: #e2e8f0; border-radius: 1px;"></div>
+        <div style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: #3b82f6; border-radius: 50%;"></div>
+      </div>
+    </div>
+  </div>
+</div>

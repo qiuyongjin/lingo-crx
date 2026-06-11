@@ -8,6 +8,7 @@ import { HistoryApp } from "../components/HistoryApp";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
 import { getRequireAltKey, getAutoSpeak } from "../utils/storage";
+import { addHistoryItem } from "../utils/historyStorage";
 import popupCss from "../styles/popup.scss?inline";
 import historyCss from "../styles/history.scss?inline";
 
@@ -24,7 +25,6 @@ export default defineContentScript({
     // --- History system ---
     let historyContainer: HTMLDivElement | null = null;
     let historyRoot: ReturnType<typeof createRoot> | null = null;
-    let saveToHistory: ((word: string, context: string) => void) | null = null;
 
     function mountHistorySystem() {
       if (historyContainer) return; // already mounted
@@ -49,13 +49,7 @@ export default defineContentScript({
       document.body.appendChild(historyContainer);
 
       historyRoot = createRoot(mountPoint);
-      historyRoot.render(
-        <HistoryApp
-          onAddItemRef={(fn) => {
-            saveToHistory = fn;
-          }}
-        />,
-      );
+      historyRoot.render(<HistoryApp />);
     }
 
     function mountPopup(x: number, y: number) {
@@ -125,8 +119,9 @@ export default defineContentScript({
         // Fire API lookup once on mount, and save to history
         useEffect(() => {
           lookup(word, sentence);
-          if (saveToHistory && sentence) {
-            saveToHistory(word, sentence);
+          // Write directly to storage to avoid React scheduling race with HistoryApp mount
+          if (sentence) {
+            addHistoryItem(word, sentence).catch(() => {});
           }
         }, [word, sentence]);
 

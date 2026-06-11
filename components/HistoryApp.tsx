@@ -5,19 +5,15 @@ import { useHistory } from "../hooks/useHistory";
 import { FloatingButton } from "./FloatingButton";
 import { HistoryPanel } from "./HistoryPanel";
 
-interface HistoryAppProps {
-  onAddItemRef: (fn: ((word: string, context: string) => void) | null) => void;
-}
-
-export function HistoryApp({ onAddItemRef }: HistoryAppProps) {
-  const { items, loading, addItem } = useHistory();
+export function HistoryApp() {
+  const { items, loading, reload } = useHistory();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Expose addItem to the content script via ref callback
+  // Reload history from storage when panel opens (items may have been
+  // added externally via addHistoryItem in the content script)
   useEffect(() => {
-    onAddItemRef(addItem);
-    return () => onAddItemRef(null);
-  }, [addItem, onAddItemRef]);
+    if (isOpen) reload();
+  }, [isOpen, reload]);
 
   const toggleOpen = useCallback(() => {
     setIsOpen((prev) => !prev);
