@@ -214,6 +214,7 @@ export default defineContentScript({
       "click",
       async (e: MouseEvent) => {
         if (shadowContainer?.contains(e.target as Node)) return;
+        if (historyContainer?.contains(e.target as Node)) return;
 
         // Clear any pending single-click timer
         if (clickTimer) {
@@ -277,6 +278,10 @@ export default defineContentScript({
       ) {
         return;
       }
+
+      // Skip if cursor is over the history system (floating button / panel)
+      const el = document.elementFromPoint(mouseX, mouseY);
+      if (historyContainer?.contains(el)) return;
 
       // Reuse existing popup logic at the last known cursor position
       mountPopup(mouseX, mouseY);

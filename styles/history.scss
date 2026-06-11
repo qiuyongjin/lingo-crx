@@ -55,15 +55,15 @@ $fade-duration:         0.2s;
 .lingo-history-fab {
   position: fixed;
   right: 12px;
+  /* top is set dynamically via inline style — fallback centre */
   top: 50%;
-  transform: translateY(-50%);
   width: 36px;
   height: 36px;
   border-radius: 50%;
   background: $color-accent;
   color: #fff;
   border: none;
-  cursor: pointer;
+  cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,15 +71,19 @@ $fade-duration:         0.2s;
   pointer-events: auto;
   transition: transform 0.15s, box-shadow 0.15s;
   z-index: 99999;
+  /* prevent the browser from intercepting touch for scroll / zoom */
+  touch-action: none;
+  user-select: none;
 
   &:hover {
-    transform: translateY(-50%) scale(1.1);
+    transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
   }
 
   svg {
     width: 18px;
     height: 18px;
+    pointer-events: none;
   }
 }
 
