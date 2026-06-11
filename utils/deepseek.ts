@@ -2,6 +2,17 @@
 
 import OpenAI from "openai";
 
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+
+const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
+const DEEPSEEK_MODEL = "deepseek-v4-flash";
+
+// ---------------------------------------------------------------------------
+// System prompts
+// ---------------------------------------------------------------------------
+
 const SYSTEM_PROMPT = `你是词典助手。使命：让用户快速看懂单词在语境中的含义和用法。
 
 根据用户输入，以固定JSON格式返回结果。
@@ -36,6 +47,10 @@ JSON格式：
 
 仅输出JSON，不要任何解释或额外文字。`;
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 export interface SentenceSegment {
   text: string;
   translation: string;
@@ -62,7 +77,20 @@ export interface DefinitionError {
 
 export type FetchDefinitionResult = DefinitionResult | DefinitionError;
 
-/** Strip markdown code fences from LLM JSON output. Handles \r\n, optional newlines. */
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
+
+/** Create an OpenAI client configured for DeepSeek API. */
+function createClient(apiKey: string): OpenAI {
+  return new OpenAI({
+    apiKey,
+    baseURL: DEEPSEEK_BASE_URL,
+    dangerouslyAllowBrowser: true,
+  });
+}
+
+/** Strip markdown code fences from LLM JSON output. */
 function stripJsonFences(raw: string): string {
   return raw
     .replace(/\r\n/g, "\n")
@@ -71,171 +99,165 @@ function stripJsonFences(raw: string): string {
     .trim();
 }
 
-/** Parse segments from a parsed JSON object. Shared between fetchDefinition and fetchSegments. */
-function parseSegments(obj: Record<string, unknown>): SentenceSegment[] {
-  let segments: SentenceSegment[] = [];
-  if (Array.isArray(obj.segments)) {
-    segments = obj.segments
-      .filter(
-        (s): s is Record<string, unknown> =>
-          typeof s === "object" && s !== null && !Array.isArray(s)
-      )
-      .map((s) => ({
-        text: typeof s.text === "string" ? s.text : "",
-        translation: typeof s.translation === "string" ? s.translation : "",
-      }))
-      .filter((s) => s.text.length > 0);
+/**
+ * Call DeepSeek chat API and return the parsed JSON response.
+ * Returns `null` when the response is empty, malformed, or not a JSON object.
+ * Throws on network / API errors (handled by callers via `normalizeError`).
+ */
+async function chat(
+  client: OpenAI,
+  systemPrompt: string,
+  userContent: string,
+  signal?: AbortSignal,
+): Promise<Record<string, unknown> | null> {
+  const response = await client.chat.completions.create(
+    {
+      model: DEEPSEEK_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.3,
+    },
+    { signal },
+  );
+
+  const raw = response.choices?.[0]?.message?.content?.trim();
+  if (!raw) return null;
+
+  const cleaned = stripJsonFences(raw);
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    /* JSON parse failed — treat as empty response */
   }
-  return segments;
+  return null;
 }
 
+/**
+ * Normalize a thrown error into `{ error, code }`.
+ * Handles AbortError, OpenAI APIError, and generic network errors.
+ */
+function normalizeError(
+  err: unknown,
+): { error: string; code: "API_ERROR" | "NETWORK_ERROR" } {
+  // User-aborted request
+  if (err instanceof DOMException && err.name === "AbortError") {
+    return { error: "请求已取消", code: "NETWORK_ERROR" };
+  }
+
+  // OpenAI SDK APIError (non-2xx response)
+  if (err && typeof err === "object" && "status" in err) {
+    const apiErr = err as { status: number; message?: string };
+    return {
+      error: `API 请求失败 (${apiErr.status}): ${apiErr.message ?? "Unknown error"}`,
+      code: "API_ERROR",
+    };
+  }
+
+  // Network connectivity
+  if (err instanceof TypeError && err.message === "Failed to fetch") {
+    return { error: "网络连接失败，请检查网络", code: "NETWORK_ERROR" };
+  }
+
+  // Unknown error
+  return {
+    error: `请求出错: ${err instanceof Error ? err.message : String(err)}`,
+    code: "NETWORK_ERROR",
+  };
+}
+
+/** Parse segments array from a parsed JSON object. */
+function parseSegments(obj: Record<string, unknown>): SentenceSegment[] {
+  if (!Array.isArray(obj.segments)) return [];
+
+  return obj.segments
+    .filter(
+      (s): s is Record<string, unknown> =>
+        typeof s === "object" && s !== null && !Array.isArray(s),
+    )
+    .map((s) => ({
+      text: typeof s.text === "string" ? s.text : "",
+      translation: typeof s.translation === "string" ? s.translation : "",
+    }))
+    .filter((s) => s.text.length > 0);
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch word definition from DeepSeek.
+ * When `sentence` is provided the word's contextual meaning is included.
+ */
 export async function fetchDefinition(
   word: string,
   apiKey: string,
   sentence?: string | null,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<FetchDefinitionResult> {
-  const client = new OpenAI({
-    apiKey,
-    baseURL: "https://api.deepseek.com",
-    dangerouslyAllowBrowser: true,
-  });
+  const client = createClient(apiKey);
 
   try {
-    const response = await client.chat.completions.create(
-      {
-        model: "deepseek-v4-flash",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: sentence ? sentence : `查词: ${word}` },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3,
-      },
-      { signal }
+    const data = await chat(
+      client,
+      SYSTEM_PROMPT,
+      sentence || `查词: ${word}`,
+      signal,
     );
 
-    const raw = response.choices?.[0]?.message?.content?.trim();
-    if (!raw) {
-      return { word, meaning: { meaning: "未找到释义", phonetic: "", phrase: "", phraseMeaning: "", segments: [] } };
-    }
-
-    const json = stripJsonFences(raw);
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(json);
-    } catch {
+    if (!data) {
       return {
         word,
         error: "解析释义失败，请重试",
         code: "API_ERROR",
       };
     }
-
-    // Reject primitives and arrays — we expect a JSON object
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      return {
-        word,
-        error: "解析释义失败，请重试",
-        code: "API_ERROR",
-      };
-    }
-
-    const obj = parsed as Record<string, unknown>;
 
     return {
       word,
       meaning: {
-        meaning: typeof obj.meaning === "string" ? obj.meaning : "未找到释义",
-        phonetic: typeof obj.phonetic === "string" ? obj.phonetic : "",
-        phrase: typeof obj.phrase === "string" ? obj.phrase : "",
-        phraseMeaning: typeof obj.phraseMeaning === "string" ? obj.phraseMeaning : "",
-        segments: parseSegments(obj),
+        meaning: typeof data.meaning === "string" ? data.meaning : "未找到释义",
+        phonetic: typeof data.phonetic === "string" ? data.phonetic : "",
+        phrase: typeof data.phrase === "string" ? data.phrase : "",
+        phraseMeaning:
+          typeof data.phraseMeaning === "string" ? data.phraseMeaning : "",
+        segments: parseSegments(data),
       },
     };
   } catch (err) {
-    if (err instanceof DOMException && err.name === "AbortError") {
-      return { word, error: "请求已取消", code: "NETWORK_ERROR" };
-    }
-    // OpenAI SDK throws an APIError for non-2xx responses
-    if (err && typeof err === "object" && "status" in err) {
-      const apiErr = err as { status: number; message?: string };
-      return {
-        word,
-        error: `API 请求失败 (${apiErr.status}): ${apiErr.message ?? "Unknown error"}`,
-        code: "API_ERROR",
-      };
-    }
-    const message =
-      err instanceof TypeError && err.message === "Failed to fetch"
-        ? "网络连接失败，请检查网络"
-        : `请求出错: ${err instanceof Error ? err.message : String(err)}`;
-    return { word, error: message, code: "NETWORK_ERROR" };
+    return { word, ...normalizeError(err) };
   }
 }
 
-/** Fetch sentence segments only — called as a separate request after the definition loads. */
+/**
+ * Fetch sentence segment translations from DeepSeek.
+ * Called concurrently with `fetchDefinition` for faster first paint.
+ */
 export async function fetchSegments(
   sentence: string,
   apiKey: string,
-  signal?: AbortSignal
-): Promise<{ segments: SentenceSegment[] } | { error: string; code: "API_ERROR" | "NETWORK_ERROR" }> {
-  const client = new OpenAI({
-    apiKey,
-    baseURL: "https://api.deepseek.com",
-    dangerouslyAllowBrowser: true,
-  });
+  signal?: AbortSignal,
+): Promise<
+  | { segments: SentenceSegment[] }
+  | { error: string; code: "API_ERROR" | "NETWORK_ERROR" }
+> {
+  const client = createClient(apiKey);
 
   try {
-    const response = await client.chat.completions.create(
-      {
-        model: "deepseek-v4-flash",
-        messages: [
-          { role: "system", content: SEGMENTS_PROMPT },
-          { role: "user", content: sentence },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3,
-      },
-      { signal }
-    );
+    const data = await chat(client, SEGMENTS_PROMPT, sentence, signal);
 
-    const raw = response.choices?.[0]?.message?.content?.trim();
-    if (!raw) {
-      return { segments: [] };
-    }
-
-    const json = stripJsonFences(raw);
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(json);
-    } catch {
+    if (!data) {
       return { error: "解析分段结果失败", code: "API_ERROR" };
     }
 
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      return { error: "解析分段结果失败", code: "API_ERROR" };
-    }
-
-    return { segments: parseSegments(parsed as Record<string, unknown>) };
+    return { segments: parseSegments(data) };
   } catch (err) {
-    if (err instanceof DOMException && err.name === "AbortError") {
-      return { error: "请求已取消", code: "NETWORK_ERROR" };
-    }
-    // OpenAI SDK throws an APIError for non-2xx responses
-    if (err && typeof err === "object" && "status" in err) {
-      const apiErr = err as { status: number; message?: string };
-      return {
-        error: `分段请求失败 (${apiErr.status}): ${apiErr.message ?? "Unknown error"}`,
-        code: "API_ERROR",
-      };
-    }
-    const message =
-      err instanceof TypeError && err.message === "Failed to fetch"
-        ? "网络连接失败，请检查网络"
-        : `请求出错: ${err instanceof Error ? err.message : String(err)}`;
-    return { error: message, code: "NETWORK_ERROR" };
+    return normalizeError(err);
   }
 }
