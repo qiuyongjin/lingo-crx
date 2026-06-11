@@ -54,12 +54,12 @@ $fade-duration:         0.2s;
 
 .lingo-history-fab {
   position: fixed;
-  right: 12px;
+  right: -22px;
   /* top is set dynamically via inline style — fallback centre */
   top: 50%;
-  width: 36px;
+  width: 44px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 18px 0 0 18px;
   background: $color-accent;
   color: #fff;
   border: none;
@@ -69,14 +69,15 @@ $fade-duration:         0.2s;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
   pointer-events: auto;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: right 0.2s ease, transform 0.15s, box-shadow 0.15s;
   z-index: 99999;
   /* prevent the browser from intercepting touch for scroll / zoom */
   touch-action: none;
   user-select: none;
+  overflow: hidden;
 
   &:hover {
-    transform: scale(1.1);
+    right: 0;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
   }
 
