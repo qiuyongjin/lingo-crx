@@ -6,9 +6,14 @@ Click any word on a webpage to see its Chinese definition in a floating popup.
 
 ## Features
 
-- **Click to define** — Click any word on any page, definition pops up below
-- **AI-powered** — Accurate, concise definitions from DeepSeek
-- **Instant** — No text selection or keyboard shortcuts needed
+- **Click to define** — Hold Alt/Option and click any word on any page, definition pops up instantly
+- **Ctrl-key lookup** — Alternatively, press and release Ctrl at the cursor position to look up the word underneath
+- **AI-powered** — Accurate, concise definitions from DeepSeek, with phonetic transcription and contextual examples
+- **Sentence breakdown** — Each sentence is split into clause-level segments with individual translations
+- **Text-to-speech** — Click the speaker icon to hear pronunciation; optionally auto-speak on every lookup
+- **Lookup history** — Every looked-up word is saved with context; view in the side panel
+- **Floating action button** — A draggable FAB on the right edge of every page opens the history side panel
+- **Quick settings** — Toggle Alt-key requirement and auto-speak directly from the popup
 
 ## Setup
 
@@ -28,4 +33,17 @@ Click any word on a webpage to see its Chinese definition in a floating popup.
 
 ### 3. Use
 
-Click any word on any webpage — the definition appears instantly. Click outside the popup to dismiss.
+- **Option+Click** any word on any webpage — the definition appears instantly
+- **Ctrl** — press and release Ctrl while hovering over a word to look it up
+- **Click outside** the popup or press Escape to dismiss
+- **FAB** — click the blue button on the right edge to open lookup history in the side panel; drag it vertically to reposition
+- **Speaker** — click the speaker icon in the popup to hear pronunciation
+- **Gear** — click the gear icon to toggle settings (Alt-key requirement, auto-speak)
+
+## Build from Source
+
+```bash
+pnpm install
+pnpm build
+# Output: dist/chrome-mv3/
+```
