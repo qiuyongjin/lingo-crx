@@ -127,7 +127,7 @@ export default defineContentScript({
         // Fire API lookup once on mount, and save to history
         useEffect(() => {
           lookup(word, sentence);
-          // Write directly to storage to avoid React scheduling race with HistoryApp mount
+          // Write directly to storage so side panel's onChanged listener picks it up
           if (sentence) {
             addHistoryItem(word, sentence).catch(() => {});
           }
