@@ -26,6 +26,32 @@ export default defineContentScript({
     let historyContainer: HTMLDivElement | null = null;
     let historyRoot: ReturnType<typeof createRoot> | null = null;
 
+    function FabApp() {
+      const [visible, setVisible] = useState(true);
+
+      useEffect(() => {
+        const listener = (message: any) => {
+          if (message.type === "sidePanelState") {
+            setVisible(!message.open);
+          }
+        };
+        chrome.runtime.onMessage.addListener(listener);
+        return () => chrome.runtime.onMessage.removeListener(listener);
+      }, []);
+
+      if (!visible) return null;
+
+      return (
+        <FloatingButton
+          onClick={() => {
+            chrome.runtime.sendMessage({ type: "openSidePanel" }).catch(() => {
+              // Background may not be ready — no-op
+            });
+          }}
+        />
+      );
+    }
+
     function mountFloatingButton() {
       if (historyContainer) return; // already mounted
 
@@ -49,15 +75,7 @@ export default defineContentScript({
       document.body.appendChild(historyContainer);
 
       historyRoot = createRoot(mountPoint);
-      historyRoot.render(
-        <FloatingButton
-          onClick={() => {
-            chrome.runtime.sendMessage({ type: "openSidePanel" }).catch(() => {
-              // Background may not be ready — no-op
-            });
-          }}
-        />,
-      );
+      historyRoot.render(<FabApp />);
     }
 
     function mountPopup(x: number, y: number) {
