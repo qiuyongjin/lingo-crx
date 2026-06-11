@@ -183,9 +183,8 @@ $fade-duration:         0.2s;
   &-context {
     font-size: $font-size-sm;
     color: $color-text-tertiary;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.5;
+    word-break: break-word;
   }
 
   &-time {
