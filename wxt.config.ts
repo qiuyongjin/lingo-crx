@@ -9,6 +9,14 @@ export default defineConfig({
     description: "Click any word to see its Chinese definition",
     permissions: ["storage", "sidePanel"],
     host_permissions: ["<all_urls>"],
+    commands: {
+      "toggle-side-panel": {
+        suggested_key: {
+          default: "Alt+L",
+        },
+        description: "Toggle the side panel",
+      },
+    },
     icons: {
       16: "icons/icon-16.png",
       32: "icons/icon-32.png",

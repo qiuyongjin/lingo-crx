@@ -12,7 +12,19 @@ export function App() {
   // side panel closes (port disconnects when the page is destroyed).
   useEffect(() => {
     const port = chrome.runtime.connect({ name: "sidepanel" });
-    return () => port.disconnect();
+
+    // Listen for close request from background (e.g., keyboard shortcut toggle)
+    const closeListener = (message: any) => {
+      if (message.type === "closeSidePanel") {
+        window.close();
+      }
+    };
+    chrome.runtime.onMessage.addListener(closeListener);
+
+    return () => {
+      port.disconnect();
+      chrome.runtime.onMessage.removeListener(closeListener);
+    };
   }, []);
 
   return (
