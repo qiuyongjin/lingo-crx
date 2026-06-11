@@ -58,6 +58,9 @@ export function extractWordFromPoint(x: number, y: number): WordInfo | null {
   // Ignore Chinese characters — this extension is for non-Chinese word lookup
   if (/[一-鿿]/.test(word)) return null;
 
+  // Ignore purely numeric content — digits, decimals, percentages
+  if (/^[\d.,%+\-\\/]+$/.test(word)) return null;
+
   // Get bounding rect for the word
   const wordRange = document.createRange();
   wordRange.setStart(node, start);
