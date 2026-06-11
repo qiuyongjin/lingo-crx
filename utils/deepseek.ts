@@ -1,6 +1,6 @@
 // utils/deepseek.ts
 
-const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
+import OpenAI from "openai";
 
 const SYSTEM_PROMPT = `你是词典助手。使命：让用户快速看懂单词在语境中的含义和用法。
 
@@ -95,14 +95,15 @@ export async function fetchDefinition(
   sentence?: string | null,
   signal?: AbortSignal
 ): Promise<FetchDefinitionResult> {
+  const client = new OpenAI({
+    apiKey,
+    baseURL: "https://api.deepseek.com",
+    dangerouslyAllowBrowser: true,
+  });
+
   try {
-    const response = await fetch(DEEPSEEK_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
+    const response = await client.chat.completions.create(
+      {
         model: "deepseek-v4-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
@@ -110,24 +111,11 @@ export async function fetchDefinition(
         ],
         response_format: { type: "json_object" },
         temperature: 0.3,
-      }),
-      signal,
-    });
+      },
+      { signal }
+    );
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "Unknown error");
-      return {
-        word,
-        error: `API 请求失败 (${response.status}): ${errorText}`,
-        code: "API_ERROR",
-      };
-    }
-
-    const data = (await response.json()) as {
-      choices: Array<{ message: { content: string } }>;
-    };
-
-    const raw = data.choices?.[0]?.message?.content?.trim();
+    const raw = response.choices?.[0]?.message?.content?.trim();
     if (!raw) {
       return { word, meaning: { meaning: "未找到释义", phonetic: "", phrase: "", phraseMeaning: "", segments: [] } };
     }
@@ -170,6 +158,15 @@ export async function fetchDefinition(
     if (err instanceof DOMException && err.name === "AbortError") {
       return { word, error: "请求已取消", code: "NETWORK_ERROR" };
     }
+    // OpenAI SDK throws an APIError for non-2xx responses
+    if (err && typeof err === "object" && "status" in err) {
+      const apiErr = err as { status: number; message?: string };
+      return {
+        word,
+        error: `API 请求失败 (${apiErr.status}): ${apiErr.message ?? "Unknown error"}`,
+        code: "API_ERROR",
+      };
+    }
     const message =
       err instanceof TypeError && err.message === "Failed to fetch"
         ? "网络连接失败，请检查网络"
@@ -184,14 +181,15 @@ export async function fetchSegments(
   apiKey: string,
   signal?: AbortSignal
 ): Promise<{ segments: SentenceSegment[] } | { error: string; code: "API_ERROR" | "NETWORK_ERROR" }> {
+  const client = new OpenAI({
+    apiKey,
+    baseURL: "https://api.deepseek.com",
+    dangerouslyAllowBrowser: true,
+  });
+
   try {
-    const response = await fetch(DEEPSEEK_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
+    const response = await client.chat.completions.create(
+      {
         model: "deepseek-v4-flash",
         messages: [
           { role: "system", content: SEGMENTS_PROMPT },
@@ -199,23 +197,11 @@ export async function fetchSegments(
         ],
         response_format: { type: "json_object" },
         temperature: 0.3,
-      }),
-      signal,
-    });
+      },
+      { signal }
+    );
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "Unknown error");
-      return {
-        error: `分段请求失败 (${response.status}): ${errorText}`,
-        code: "API_ERROR",
-      };
-    }
-
-    const data = (await response.json()) as {
-      choices: Array<{ message: { content: string } }>;
-    };
-
-    const raw = data.choices?.[0]?.message?.content?.trim();
+    const raw = response.choices?.[0]?.message?.content?.trim();
     if (!raw) {
       return { segments: [] };
     }
@@ -237,6 +223,14 @@ export async function fetchSegments(
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") {
       return { error: "请求已取消", code: "NETWORK_ERROR" };
+    }
+    // OpenAI SDK throws an APIError for non-2xx responses
+    if (err && typeof err === "object" && "status" in err) {
+      const apiErr = err as { status: number; message?: string };
+      return {
+        error: `分段请求失败 (${apiErr.status}): ${apiErr.message ?? "Unknown error"}`,
+        code: "API_ERROR",
+      };
     }
     const message =
       err instanceof TypeError && err.message === "Failed to fetch"
