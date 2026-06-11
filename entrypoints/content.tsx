@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import { useEffect, useState } from "react";
 import { WordPopup } from "../components/WordPopup";
 import { SettingsPanel } from "../components/SettingsPanel";
-import { HistoryApp } from "../components/HistoryApp";
+import { FloatingButton } from "../components/FloatingButton";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
 import { getRequireAltKey, getAutoSpeak } from "../utils/storage";
@@ -26,7 +26,7 @@ export default defineContentScript({
     let historyContainer: HTMLDivElement | null = null;
     let historyRoot: ReturnType<typeof createRoot> | null = null;
 
-    function mountHistorySystem() {
+    function mountFloatingButton() {
       if (historyContainer) return; // already mounted
 
       historyContainer = document.createElement("div");
@@ -49,7 +49,15 @@ export default defineContentScript({
       document.body.appendChild(historyContainer);
 
       historyRoot = createRoot(mountPoint);
-      historyRoot.render(<HistoryApp />);
+      historyRoot.render(
+        <FloatingButton
+          onClick={() => {
+            chrome.runtime.sendMessage({ type: "openSidePanel" }).catch(() => {
+              // Background may not be ready — no-op
+            });
+          }}
+        />,
+      );
     }
 
     function mountPopup(x: number, y: number) {
@@ -287,7 +295,7 @@ export default defineContentScript({
       mountPopup(mouseX, mouseY);
     });
 
-    // Mount history system (floating button + slide-in panel)
-    mountHistorySystem();
+    // Mount floating button (opens side panel via background message)
+    mountFloatingButton();
   },
 });
