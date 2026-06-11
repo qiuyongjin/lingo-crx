@@ -35,7 +35,7 @@ export function HistoryApp() {
 
   return (
     <div className="lingo-history-root">
-      <FloatingButton onClick={toggleOpen} />
+      {!isOpen && <FloatingButton onClick={toggleOpen} />}
       {isOpen && <HistoryPanel items={items} loading={loading} onClose={close} />}
     </div>
   );
