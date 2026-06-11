@@ -55,6 +55,9 @@ export function extractWordFromPoint(x: number, y: number): WordInfo | null {
 
   if (!word || word.length === 0 || word.length > 50) return null;
 
+  // Ignore Chinese characters — this extension is for non-Chinese word lookup
+  if (/[一-鿿]/.test(word)) return null;
+
   // Get bounding rect for the word
   const wordRange = document.createRange();
   wordRange.setStart(node, start);
