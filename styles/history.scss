@@ -1,0 +1,227 @@
+// styles/history.scss — History panel & floating button styles
+
+// ── Design Tokens (shared with popup.scss) ──────────────────────
+
+$color-bg:              #ffffff;
+$color-text-primary:    #1e293b;
+$color-text-secondary:  #475569;
+$color-text-tertiary:   #64748b;
+$color-text-muted:      #94a3b8;
+$color-accent:          #3b82f6;
+$color-error:           #ef4444;
+$color-border:          #e2e8f0;
+$color-shadow:          rgba(0, 0, 0, 0.15);
+$color-bg-subtle:       #f8fafc;
+
+$font-family-system:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                        "Helvetica Neue", Arial, sans-serif;
+$font-size-sm:          13px;
+$font-size-md:          14px;
+$font-weight-medium:    500;
+$font-weight-semibold:  600;
+$line-height-base:      1.5;
+
+$spacing-xs:            4px;
+$spacing-sm:            6px;
+$spacing-md:            8px;
+$spacing-lg:            10px;
+$spacing-xl:            14px;
+
+$panel-width:           320px;
+$fade-duration:         0.2s;
+
+// ── Base ───────────────────────────────────────────────────────
+
+:host {
+  all: initial;
+}
+
+// ── Wrapper (covers full viewport so panel background overlay works) ─
+
+.lingo-history-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 99998;
+  font-family: $font-family-system;
+  line-height: $line-height-base;
+}
+
+// ── Floating Button ────────────────────────────────────────────
+
+.lingo-history-fab {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: $color-accent;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  pointer-events: auto;
+  transition: transform 0.15s, box-shadow 0.15s;
+  z-index: 99999;
+
+  &:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ── Panel Overlay (click to dismiss) ───────────────────────────
+
+.lingo-history-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  animation: lingo-history-fade-in $fade-duration ease-out;
+}
+
+// ── Panel ──────────────────────────────────────────────────────
+
+.lingo-history-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: $panel-width;
+  height: 100vh;
+  background: $color-bg;
+  box-shadow: -2px 0 12px $color-shadow;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  animation: lingo-history-slide-in 0.25s ease-out;
+  z-index: 1;
+}
+
+// ── Panel Header ───────────────────────────────────────────────
+
+.lingo-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-xl $spacing-xl;
+  border-bottom: 1px solid $color-border;
+  flex-shrink: 0;
+
+  &-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  &-count {
+    font-size: 12px;
+    color: $color-text-muted;
+    margin-left: $spacing-sm;
+  }
+
+  &-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: $color-text-muted;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+
+    &:hover {
+      color: $color-text-secondary;
+      background: rgba($color-text-muted, 0.1);
+    }
+  }
+}
+
+// ── Panel List ─────────────────────────────────────────────────
+
+.lingo-history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-xs 0;
+}
+
+// ── List Item ──────────────────────────────────────────────────
+
+.lingo-history-item {
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $color-border;
+  cursor: default;
+  transition: background 0.1s;
+
+  &:hover {
+    background: $color-bg-subtle;
+  }
+
+  &-word {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin-bottom: 2px;
+  }
+
+  &-context {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-time {
+    font-size: 11px;
+    color: $color-text-muted;
+    margin-top: $spacing-xs;
+  }
+}
+
+// ── Empty State ────────────────────────────────────────────────
+
+.lingo-history-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+}
+
+// ── Animations ─────────────────────────────────────────────────
+
+@keyframes lingo-history-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes lingo-history-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
