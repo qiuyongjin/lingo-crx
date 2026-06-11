@@ -3,12 +3,26 @@
 import { MeaningState } from "../hooks/useWordMeaning";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { SpeakButton } from "./SpeakButton";
+import { SentenceSegment } from "../utils/deepseek";
 
 interface WordPopupProps {
   state: MeaningState;
   top: number;
   left: number;
   onToggleSettings: () => void;
+}
+
+function SegmentList({ segments }: { segments: SentenceSegment[] }) {
+  return (
+    <div className="lingo-segments">
+      {segments.map((seg, i) => (
+        <div key={i} className="lingo-segment">
+          <div className="lingo-segment-text">{seg.text}</div>
+          <div className="lingo-segment-translation">{seg.translation}</div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function WordPopup({
@@ -55,10 +69,18 @@ export function WordPopup({
       )}
 
       {state.status === "loading" && (
-        <div className="lingo-loading">
-          <LoadingSpinner />
-          <span>Thinking...</span>
-        </div>
+        <>
+          <div className="lingo-loading">
+            <LoadingSpinner />
+            <span>Thinking...</span>
+          </div>
+          {state.segments && state.segments.length > 0 && (
+            <SegmentList segments={state.segments} />
+          )}
+          {state.segmentsError && (
+            <div className="lingo-segments-error">{state.segmentsError}</div>
+          )}
+        </>
       )}
 
       {state.status === "result" && (
@@ -83,14 +105,7 @@ export function WordPopup({
             <div className="lingo-segments-error">{state.segmentsError}</div>
           )}
           {!state.segmentsLoading && state.meaning.segments && state.meaning.segments.length > 0 && (
-            <div className="lingo-segments">
-              {state.meaning.segments.map((seg, i) => (
-                <div key={i} className="lingo-segment">
-                  <div className="lingo-segment-text">{seg.text}</div>
-                  <div className="lingo-segment-translation">{seg.translation}</div>
-                </div>
-              ))}
-            </div>
+            <SegmentList segments={state.meaning.segments} />
           )}
         </>
       )}
