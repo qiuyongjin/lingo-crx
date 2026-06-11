@@ -18,6 +18,19 @@ export function useHistory() {
     });
   }, []);
 
+  // Listen for changes from other contexts (e.g., content script writes)
+  useEffect(() => {
+    const listener = (
+      changes: Record<string, chrome.storage.StorageChange>,
+    ) => {
+      if (changes["lingo-history"]) {
+        getHistory().then((data) => setItems(data));
+      }
+    };
+    chrome.storage.onChanged.addListener(listener);
+    return () => chrome.storage.onChanged.removeListener(listener);
+  }, []);
+
   const addItem = useCallback(async (word: string, context: string) => {
     await addHistoryItem(word, context);
     // Reload to get deduped/pruned list
