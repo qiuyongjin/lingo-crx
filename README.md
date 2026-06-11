@@ -14,6 +14,7 @@ Click any word on a webpage to see its Chinese definition in a floating popup.
 - **Lookup history** — Every looked-up word is saved with context; view in the side panel
 - **Floating action button** — A draggable FAB on the right edge of every page opens the history side panel
 - **Quick settings** — Toggle Alt-key requirement and auto-speak directly from the popup
+- **Keyboard shortcut** — Press Option+L to toggle the side panel open/closed from any tab
 
 ## Setup
 
@@ -39,6 +40,7 @@ Click any word on a webpage to see its Chinese definition in a floating popup.
 - **FAB** — click the blue button on the right edge to open lookup history in the side panel; drag it vertically to reposition
 - **Speaker** — click the speaker icon in the popup to hear pronunciation
 - **Gear** — click the gear icon to toggle settings (Alt-key requirement, auto-speak)
+- **Option+L** — toggle the side panel open/closed from any tab
 
 ## Build from Source
 
