@@ -7,7 +7,7 @@ export default defineConfig({
   manifest: {
     name: "Lingo",
     description: "Click any word to see its Chinese definition",
-    permissions: ["storage"],
+    permissions: ["storage", "sidePanel"],
     host_permissions: ["<all_urls>"],
     icons: {
       16: "icons/icon-16.png",
