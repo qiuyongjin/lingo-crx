@@ -11,23 +11,36 @@ const SYSTEM_PROMPT = `你是词典助手。使命：让用户看懂单词在语
 2. 给出该词在此语境下的中文释义
 3. 给出该词的国际音标(IPA)注音
 4. 翻译整个短语
+5. 将整句原文拆分成若干个短句/片段（segments），每个片段给出对应的中文翻译
 
 JSON格式：
-{"meaning":"单词在语境中的中文释义","phonetic":"IPA音标，如 /ˈɪŋɡlɪʃ/","phrase":"原文短语","phraseMeaning":"短语的中文翻译"}
+{"meaning":"单词在语境中的中文释义","phonetic":"IPA音标，如 /ˈɪŋɡlɪʃ/","phrase":"原文短语","phraseMeaning":"短语的中文翻译","segments":[{"text":"原文片段1","translation":"中文翻译1"},{"text":"原文片段2","translation":"中文翻译2"}]}
+
+拆分segments的规则：
+- 按逗号、分号、连接词（and, but, or, so, because等）、关系代词（which, that, who等）等自然断点拆分
+- 每个片段应是语法上相对完整的短语或子句
+- 片段不宜过长，控制在 2-12 个单词左右
+- 每个片段必须提供准确的中文翻译
 
 ## 用户仅提供单词时
-只需返回 meaning 和 phonetic 字段，phrase 和 phraseMeaning 可省略。
+只需返回 meaning 和 phonetic 字段，phrase、phraseMeaning 和 segments 可省略。
 
 JSON格式：
 {"meaning":"常见中文释义","phonetic":"IPA音标，如 /ˈɪŋɡlɪʃ/"}
 
 仅输出JSON，不要任何解释或额外文字。`;
 
+export interface SentenceSegment {
+  text: string;
+  translation: string;
+}
+
 export interface ContextualMeaning {
   meaning: string;
   phonetic: string;
   phrase: string;
   phraseMeaning: string;
+  segments: SentenceSegment[];
 }
 
 export interface DefinitionResult {
@@ -118,6 +131,22 @@ export async function fetchDefinition(
     }
 
     const obj = parsed as Record<string, unknown>;
+
+    // Parse segments: array of {text, translation} objects
+    let segments: SentenceSegment[] = [];
+    if (Array.isArray(obj.segments)) {
+      segments = obj.segments
+        .filter(
+          (s): s is Record<string, unknown> =>
+            typeof s === "object" && s !== null && !Array.isArray(s)
+        )
+        .map((s) => ({
+          text: typeof s.text === "string" ? s.text : "",
+          translation: typeof s.translation === "string" ? s.translation : "",
+        }))
+        .filter((s) => s.text.length > 0);
+    }
+
     return {
       word,
       meaning: {
@@ -125,6 +154,7 @@ export async function fetchDefinition(
         phonetic: typeof obj.phonetic === "string" ? obj.phonetic : "",
         phrase: typeof obj.phrase === "string" ? obj.phrase : "",
         phraseMeaning: typeof obj.phraseMeaning === "string" ? obj.phraseMeaning : "",
+        segments,
       },
     };
   } catch (err) {

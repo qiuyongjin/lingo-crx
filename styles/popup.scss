@@ -245,6 +245,43 @@ $z-max:                 999999;
   word-break: break-word;
 }
 
+// ── Sentence Segments ──────────────────────────────────────────
+
+.lingo-segments {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: $separator;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.lingo-segment {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  &-text {
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+    font-weight: $font-weight-medium;
+    word-break: break-word;
+  }
+
+  &-translation {
+    font-size: 13px;
+    color: $color-text-tertiary;
+    padding-left: $spacing-md;
+    word-break: break-word;
+    position: relative;
+
+    &::before {
+      content: "→ ";
+      color: $color-text-muted;
+    }
+  }
+}
+
 // ── Settings Panel ────────────────────────────────────────────
 
 .lingo-settings {

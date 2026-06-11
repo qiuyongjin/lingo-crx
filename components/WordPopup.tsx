@@ -73,9 +73,16 @@ export function WordPopup({
               <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
             </div>
           )}
-          {/* {state.sentence && (
-            <div className="lingo-sentence">{state.sentence}</div>
-          )} */}
+          {state.meaning.segments && state.meaning.segments.length > 0 && (
+            <div className="lingo-segments">
+              {state.meaning.segments.map((seg, i) => (
+                <div key={i} className="lingo-segment">
+                  <div className="lingo-segment-text">{seg.text}</div>
+                  <div className="lingo-segment-translation">{seg.translation}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
 
