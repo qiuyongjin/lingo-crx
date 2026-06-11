@@ -4,10 +4,12 @@ import { createRoot } from "react-dom/client";
 import { useEffect, useState } from "react";
 import { WordPopup } from "../components/WordPopup";
 import { SettingsPanel } from "../components/SettingsPanel";
+import { HistoryApp } from "../components/HistoryApp";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
 import { getRequireAltKey, getAutoSpeak } from "../utils/storage";
 import popupCss from "../styles/popup.scss?inline";
+import historyCss from "../styles/history.scss?inline";
 
 export default defineContentScript({
   matches: ["<all_urls>"],
@@ -18,6 +20,43 @@ export default defineContentScript({
     let reactRoot: ReturnType<typeof createRoot> | null = null;
     let outsideClickListener: ((e: MouseEvent) => void) | null = null;
     let escapeKeyListener: ((e: KeyboardEvent) => void) | null = null;
+
+    // --- History system ---
+    let historyContainer: HTMLDivElement | null = null;
+    let historyRoot: ReturnType<typeof createRoot> | null = null;
+    let saveToHistory: ((word: string, context: string) => void) | null = null;
+
+    function mountHistorySystem() {
+      if (historyContainer) return; // already mounted
+
+      historyContainer = document.createElement("div");
+      historyContainer.style.position = "absolute";
+      historyContainer.style.top = "0";
+      historyContainer.style.left = "0";
+      historyContainer.style.width = "0";
+      historyContainer.style.height = "0";
+      historyContainer.style.zIndex = "999998";
+
+      const shadowRoot = historyContainer.attachShadow({ mode: "closed" });
+
+      const styleEl = document.createElement("style");
+      styleEl.textContent = historyCss;
+      shadowRoot.appendChild(styleEl);
+
+      const mountPoint = document.createElement("div");
+      shadowRoot.appendChild(mountPoint);
+
+      document.body.appendChild(historyContainer);
+
+      historyRoot = createRoot(mountPoint);
+      historyRoot.render(
+        <HistoryApp
+          onAddItemRef={(fn) => {
+            saveToHistory = fn;
+          }}
+        />,
+      );
+    }
 
     function mountPopup(x: number, y: number) {
       // Remove existing popup first
@@ -83,9 +122,12 @@ export default defineContentScript({
         const { state, lookup, reset } = useWordMeaning();
         const [showSettings, setShowSettings] = useState(false);
 
-        // Fire API lookup once on mount
+        // Fire API lookup once on mount, and save to history
         useEffect(() => {
           lookup(word, sentence);
+          if (saveToHistory && sentence) {
+            saveToHistory(word, sentence);
+          }
         }, [word, sentence]);
 
         if (showSettings) {
@@ -244,5 +286,8 @@ export default defineContentScript({
       // Reuse existing popup logic at the last known cursor position
       mountPopup(mouseX, mouseY);
     });
+
+    // Mount history system (floating button + slide-in panel)
+    mountHistorySystem();
   },
 });
