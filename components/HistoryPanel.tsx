@@ -5,7 +5,7 @@ import { type HistoryItem } from "../utils/historyStorage";
 interface HistoryPanelProps {
   items: HistoryItem[];
   loading: boolean;
-  onClose: () => void;
+  onClose?: () => void;  // optional — absent in side panel context
 }
 
 function formatTime(timestamp: number): string {
@@ -27,8 +27,8 @@ function formatTime(timestamp: number): string {
 export function HistoryPanel({ items, loading, onClose }: HistoryPanelProps) {
   return (
     <>
-      {/* Backdrop overlay — click to dismiss */}
-      <div className="lingo-history-overlay" onClick={onClose} />
+      {/* Backdrop overlay — click to dismiss (only when onClose is provided) */}
+      {onClose && <div className="lingo-history-overlay" onClick={onClose} />}
 
       {/* Panel */}
       <div className="lingo-history-panel">
@@ -40,26 +40,28 @@ export function HistoryPanel({ items, loading, onClose }: HistoryPanelProps) {
               <span className="lingo-history-header-count">{items.length}条</span>
             )}
           </div>
-          <button
-            className="lingo-history-header-close"
-            onClick={onClose}
-            title="关闭"
-            aria-label="关闭历史面板"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {onClose && (
+            <button
+              className="lingo-history-header-close"
+              onClick={onClose}
+              title="关闭"
+              aria-label="关闭历史面板"
             >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* List or Empty */}
