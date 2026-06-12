@@ -9,6 +9,7 @@ interface WordPopupProps {
   state: MeaningState;
   top: number;
   left: number;
+  arrowLeft: number;
   onToggleSettings: () => void;
 }
 
@@ -29,12 +30,18 @@ export function WordPopup({
   state,
   top,
   left,
+  arrowLeft,
   onToggleSettings,
 }: WordPopupProps) {
   return (
     <div
       className="lingo-popup lingo-popup--split"
-      style={{ top: `${top}px`, left: `${left}px` }}
+      style={{
+        top: `${top}px`,
+        left: `${left}px`,
+        "--arrow-left": `${arrowLeft}px`,
+        "--arrow-transform": "none",
+      } as React.CSSProperties}
       data-testid="lingo-popup"
     >
       <button

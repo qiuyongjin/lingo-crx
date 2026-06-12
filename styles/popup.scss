@@ -66,12 +66,14 @@ $z-max:                 999999;
   animation: lingo-fade-in $fade-duration ease-out;
 
   // Arrow pointer above the popup
+  // Position is dynamic via --arrow-left (px from left edge, tip-center aligned).
+  // Falls back to centered when not set (e.g. SettingsPanel).
   &::after {
     content: "";
     position: absolute;
     top: -$arrow-size;
-    left: 50%;
-    transform: translateX(-50%);
+    left: var(--arrow-left, 50%);
+    transform: var(--arrow-transform, translateX(-50%));
     width: 0;
     height: 0;
     border-left: $arrow-size solid transparent;
