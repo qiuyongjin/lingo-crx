@@ -98,33 +98,35 @@ export default defineContentScript({
         }
       });
 
-      // Calculate position: below the word, 6px gap, centered horizontally
+      // Calculate position: below the word, 6px gap, centered horizontally.
+      // We use viewport coordinates because the shadow host is position:fixed at (0,0).
       const popupWidth = 400;
-      let top = wordInfo.rect.bottom + 6 + window.scrollY;
-      let left = wordInfo.rect.left + window.scrollX + wordInfo.rect.width / 2 - popupWidth / 2;
+      let top = wordInfo.rect.bottom + 6;
+      let left = wordInfo.rect.left + wordInfo.rect.width / 2 - popupWidth / 2;
 
       // If popup would overflow viewport bottom, flip above the word
       const estimatedHeight = 60;
-      if (top + estimatedHeight > window.scrollY + window.innerHeight) {
+      if (top + estimatedHeight > window.innerHeight) {
         top = wordInfo.rect.top - 6 - estimatedHeight;
-        if (top < window.scrollY) {
-          top = wordInfo.rect.bottom + 6 + window.scrollY;
+        if (top < 0) {
+          top = wordInfo.rect.bottom + 6;
         }
       }
 
-      // Clamp left to keep popup within viewport bounds
-      const minLeft = window.scrollX + 8;
-      const maxLeft = window.scrollX + window.innerWidth - popupWidth - 8;
+      // Clamp horizontal position to keep popup fully within the viewport
+      const minLeft = 8;
+      const maxLeft = window.innerWidth - popupWidth - 8;
       left = Math.min(maxLeft, Math.max(minLeft, left));
 
       // Arrow horizontal position — points to word center, relative to popup left edge
-      const wordCenterX = wordInfo.rect.left + window.scrollX + wordInfo.rect.width / 2;
+      const wordCenterX = wordInfo.rect.left + wordInfo.rect.width / 2;
       let arrowLeft = wordCenterX - left - 6; // -6: half arrow width so tip aligns with word center
       arrowLeft = Math.min(popupWidth - 12, Math.max(12, arrowLeft));
 
-      // Create zero-size anchor div hosting the Shadow DOM
+      // Create zero-size anchor div hosting the Shadow DOM.
+      // position:fixed ensures viewport-relative coordinates inside the shadow.
       shadowContainer = document.createElement("div");
-      shadowContainer.style.position = "absolute";
+      shadowContainer.style.position = "fixed";
       shadowContainer.style.top = "0";
       shadowContainer.style.left = "0";
       shadowContainer.style.width = "0";
