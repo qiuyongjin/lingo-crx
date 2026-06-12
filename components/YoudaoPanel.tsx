@@ -43,7 +43,7 @@ export function YoudaoPanel({ data, loading, word }: YoudaoPanelProps) {
   }
 
   const showSeparator =
-    (data.phrases.length > 0 || data.relWords.length > 0) &&
+    (data.phrases.length > 0 || data.sentences.length > 0) &&
     (data.translations.length > 0 || data.examTypes.length > 0);
 
   return (
@@ -94,23 +94,18 @@ export function YoudaoPanel({ data, loading, word }: YoudaoPanelProps) {
         </div>
       )}
 
-      {data.relWords.length > 0 && (
+      {data.sentences.length > 0 && (
         <div className="lingo-dict-section">
-          <div className="lingo-dict-section-title">相关词汇</div>
-          {data.relWords.map((group, i) => (
-            <div key={i} className="lingo-dict-relgroup">
-              <span className="lingo-dict-relgroup-pos">{group.pos}</span>
-              <span className="lingo-dict-relgroup-words">
-                {group.words.map((w, j) => (
-                  <span key={j} className="lingo-dict-relword">
-                    {w.word}
-                  </span>
-                ))}
-              </span>
+          <div className="lingo-dict-section-title">双语例句</div>
+          {data.sentences.map((s, i) => (
+            <div key={i} className="lingo-dict-sentence">
+              <div className="lingo-dict-sentence-en">{s.english}</div>
+              <div className="lingo-dict-sentence-tran">{s.translation}</div>
             </div>
           ))}
         </div>
       )}
+
     </div>
   );
 }

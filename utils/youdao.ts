@@ -24,6 +24,11 @@ export interface YoudaoRelWord {
   words: { word: string; tran: string }[];
 }
 
+export interface YoudaoSentence {
+  english: string;
+  translation: string;
+}
+
 export interface YoudaoData {
   word: string;
   usphone?: string;
@@ -33,6 +38,7 @@ export interface YoudaoData {
   examTypes: string[];
   phrases: YoudaoPhrase[];
   relWords: YoudaoRelWord[];
+  sentences: YoudaoSentence[];
 }
 
 // ---------------------------------------------------------------------------
@@ -88,6 +94,17 @@ function parseRelWords(rels: unknown[]): YoudaoRelWord[] {
       return words.length > 0 ? { pos: rel.pos as string, words } : null;
     })
     .filter((r): r is YoudaoRelWord => r !== null);
+}
+
+/** Parse the `blng_sents_part.sentence-pair` array — bilingual example sentences. */
+function parseSentences(pairs: unknown[]): YoudaoSentence[] {
+  return pairs
+    .map((p: any) => {
+      const english = p?.sentence ?? "";
+      const translation = p?.["sentence-translation"] ?? "";
+      return { english, translation };
+    })
+    .filter((s) => s.english && s.translation);
 }
 
 // ---------------------------------------------------------------------------
@@ -152,5 +169,6 @@ function parseResult(
     examTypes: Array.isArray(ec.exam_type) ? ec.exam_type : [],
     phrases: parsePhrases(d?.phrs?.phrs ?? []),
     relWords: parseRelWords(d?.rel_word?.rels ?? []),
+    sentences: parseSentences(d?.blng_sents_part?.["sentence-pair"] ?? []),
   };
 }

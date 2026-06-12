@@ -232,6 +232,11 @@ $z-max:                 999999;
     }
   }
 
+  .lingo-dict-section + .lingo-dict-section {
+    padding-top: $spacing-sm;
+    border-top: $separator;
+  }
+
   &-section-title {
     font-size: 11px;
     font-weight: $font-weight-medium;
@@ -245,6 +250,23 @@ $z-max:                 999999;
     margin-bottom: 4px;
 
     &-text {
+      color: $color-text-secondary;
+      font-weight: $font-weight-medium;
+    }
+
+    &-tran {
+      color: $color-text-muted;
+      font-size: 11px;
+      margin-top: 1px;
+    }
+  }
+
+  // Sentence
+  &-sentence {
+    line-height: 1.35;
+    margin-bottom: 4px;
+
+    &-en {
       color: $color-text-secondary;
       font-weight: $font-weight-medium;
     }
