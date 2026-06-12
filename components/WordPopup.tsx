@@ -133,7 +133,7 @@ export function WordPopup({
         </div>
       </div>
 
-      <div className="lingo-toolbar">
+      <div className="lingo-footer">
         <button
           className="lingo-settings-btn"
           onClick={onToggleSettings}
