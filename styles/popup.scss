@@ -390,12 +390,17 @@ $z-max:                 999999;
   }
 }
 
+// ── Toolbar ─────────────────────────────────────────────────
+
+.lingo-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: $spacing-sm;
+}
+
 // ── Settings Button ───────────────────────────────────────────
 
 .lingo-settings-btn {
-  position: absolute;
-  top: $spacing-sm;
-  right: $spacing-sm;
   display: inline-flex;
   align-items: center;
   justify-content: center;
