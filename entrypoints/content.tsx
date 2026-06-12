@@ -98,9 +98,10 @@ export default defineContentScript({
         }
       });
 
-      // Calculate position: below the word, 6px gap
+      // Calculate position: below the word, 6px gap, centered horizontally
+      const popupWidth = 520;
       let top = wordInfo.rect.bottom + 6 + window.scrollY;
-      let left = wordInfo.rect.left + window.scrollX;
+      let left = wordInfo.rect.left + window.scrollX + wordInfo.rect.width / 2 - popupWidth / 2;
 
       // If popup would overflow viewport bottom, flip above the word
       const estimatedHeight = 60;
@@ -111,9 +112,10 @@ export default defineContentScript({
         }
       }
 
-      // Clamp left to prevent overflow off the right side
-      const maxLeft = window.scrollX + window.innerWidth - 528;
-      left = Math.min(left, Math.max(maxLeft, window.scrollX + 8));
+      // Clamp left to keep popup within viewport bounds
+      const minLeft = window.scrollX + 8;
+      const maxLeft = window.scrollX + window.innerWidth - popupWidth - 8;
+      left = Math.min(maxLeft, Math.max(minLeft, left));
 
       // Create zero-size anchor div hosting the Shadow DOM
       shadowContainer = document.createElement("div");
