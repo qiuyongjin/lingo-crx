@@ -59,7 +59,7 @@ $z-max:                 999999;
   background: $color-bg;
   border-radius: $popup-radius;
   box-shadow: 0 2px 12px $color-shadow;
-  width: $popup-width;
+  min-width: $popup-width;
   padding: $spacing-lg $spacing-xl;
   font-family: $font-family-system;
   line-height: $line-height-base;
@@ -82,10 +82,13 @@ $z-max:                 999999;
     border-bottom: $arrow-size solid $color-bg;
   }
 
-  // Wider variant for the split (left-right) layout
-  &--split {
-    width: 400px;
-  }
+}
+
+// ── Scrollable inner wrapper (avoids clipping ::after arrow) ──
+
+.lingo-popup-scroll {
+  max-height: 350px;
+  overflow-y: auto;
 }
 
 // ── Split Panels (Left-Right Layout) ───────────────────────────
@@ -95,12 +98,13 @@ $z-max:                 999999;
 }
 
 .lingo-panel-left {
-  flex: 1;
+  flex: 0 0 300px;
   min-width: 0;
 }
 
 .lingo-panel-right {
-  flex: 1;
+  flex: 0 0 200px;
+  box-sizing: border-box;
   min-width: 0;
   padding-left: $spacing-xl;
   border-left: 1px solid $color-border;
