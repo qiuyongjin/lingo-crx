@@ -1,8 +1,10 @@
 // components/WordPopup.tsx
 
 import { MeaningState } from "../hooks/useWordMeaning";
+import { useYoudaoDictionary } from "../hooks/useYoudaoDictionary";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { SpeakButton } from "./SpeakButton";
+import { YoudaoPanel } from "./YoudaoPanel";
 import { SentenceSegment } from "../utils/deepseek";
 
 interface WordPopupProps {
@@ -33,6 +35,10 @@ export function WordPopup({
   arrowLeft,
   onToggleSettings,
 }: WordPopupProps) {
+  // Extract word from the discriminated union — available in loading/result/error states
+  const word = "word" in state ? state.word : null;
+  const { data: youdaoData, loading: youdaoLoading } = useYoudaoDictionary(word);
+
   return (
     <div
       className="lingo-popup lingo-popup--split"
@@ -144,11 +150,7 @@ export function WordPopup({
         </div>
 
         <div className="lingo-panel-right">
-          <div className="lingo-placeholder">
-            <div className="lingo-placeholder-icon">✨</div>
-            <div className="lingo-placeholder-title">更多功能</div>
-            <div className="lingo-placeholder-text">即将推出</div>
-          </div>
+          <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
         </div>
       </div>
 

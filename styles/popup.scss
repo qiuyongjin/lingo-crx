@@ -105,11 +105,11 @@ $z-max:                 999999;
   padding-left: $spacing-xl;
   border-left: 1px solid $color-border;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
 }
 
 .lingo-placeholder {
+  margin: auto;
   text-align: center;
   color: $color-text-muted;
 
@@ -127,6 +127,165 @@ $z-max:                 999999;
 
   &-text {
     font-size: 12px;
+  }
+}
+
+// ── Youdao Dictionary Panel (Right Panel) ─────────────────────────┐
+
+.lingo-dict-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.lingo-dict {
+  font-size: 12px;
+  color: $color-text-secondary;
+  width: 100%;
+
+  // Translations
+  &-translations {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-row {
+    display: flex;
+    gap: $spacing-xs;
+    line-height: 1.4;
+  }
+
+  &-pos {
+    color: $color-accent;
+    font-weight: $font-weight-medium;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &-def {
+    color: $color-text-secondary;
+    word-break: break-word;
+  }
+
+  // Exam level badges
+  &-exams {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-exam-tag {
+    display: inline-block;
+    padding: 1px 5px;
+    font-size: 10px;
+    line-height: 1.4;
+    border-radius: 3px;
+    background: #f1f5f9;
+    color: $color-text-tertiary;
+    border: 1px solid #e2e8f0;
+  }
+
+  // Word forms
+  &-forms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px $spacing-sm;
+    margin-bottom: 0;
+  }
+
+  &-form {
+    white-space: nowrap;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  &-form-name {
+    color: $color-text-muted;
+    margin-right: 1px;
+  }
+
+  &-form-value {
+    color: $color-text-secondary;
+  }
+
+  // Separator between upper (ec) and lower (phrases/relwords) blocks
+  &-separator {
+    height: 0;
+    border-top: $separator;
+    margin: $spacing-sm 0;
+  }
+
+  // Section
+  &-section {
+    margin-bottom: $spacing-sm;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &-section-title {
+    font-size: 11px;
+    font-weight: $font-weight-medium;
+    color: $color-text-muted;
+    margin-bottom: $spacing-xs;
+  }
+
+  // Phrase
+  &-phrase {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-sm;
+    line-height: 1.35;
+    margin-bottom: 2px;
+
+    &-text {
+      color: $color-text-secondary;
+      font-weight: $font-weight-medium;
+    }
+
+    &-tran {
+      color: $color-text-muted;
+      text-align: right;
+      flex-shrink: 0;
+    }
+  }
+
+  // Related word group
+  &-relgroup {
+    display: flex;
+    gap: $spacing-xs;
+    line-height: 1.4;
+    margin-bottom: 1px;
+  }
+
+  &-relgroup-pos {
+    color: $color-accent;
+    font-weight: $font-weight-medium;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 28px;
+  }
+
+  &-relgroup-words {
+    color: $color-text-secondary;
+  }
+
+  &-relword {
+    margin-right: $spacing-xs;
+
+    &::after {
+      content: " ·";
+      color: $color-text-muted;
+    }
+
+    &:last-child::after {
+      content: "";
+    }
   }
 }
 

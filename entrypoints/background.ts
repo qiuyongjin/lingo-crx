@@ -50,6 +50,20 @@ export default defineBackground(() => {
     }
   });
 
+  // --- Youdao dictionary proxy ---
+  // Content scripts can't always reach dict.youdao.com directly (403 if the
+  // server checks Origin/Referer). Proxy through the service worker instead.
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message.type === "fetchYoudao") {
+      const word = message.word as string;
+      fetch(`https://dict.youdao.com/jsonapi?q=${encodeURIComponent(word)}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => sendResponse({ data }))
+        .catch(() => sendResponse({ data: null }));
+      return true; // keep the message channel open for async response
+    }
+  });
+
   // Track side panel lifecycle via long-lived port.
   // The port auto-disconnects when the panel page is destroyed (closed).
   chrome.runtime.onConnect.addListener((port) => {
