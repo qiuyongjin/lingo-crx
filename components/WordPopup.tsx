@@ -52,6 +52,10 @@ export function WordPopup({
     >
       <div className="lingo-panels">
         <div className="lingo-panel-left">
+          <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
+        </div>
+
+        <div className="lingo-panel-right">
           {"word" in state && (
             <div className="lingo-word">
               <div className="lingo-word-row">
@@ -126,10 +130,6 @@ export function WordPopup({
               </a>
             </div>
           )}
-        </div>
-
-        <div className="lingo-panel-right">
-          <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
         </div>
       </div>
 
