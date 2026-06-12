@@ -99,7 +99,7 @@ export default defineContentScript({
       });
 
       // Calculate position: below the word, 6px gap, centered horizontally
-      const popupWidth = 520;
+      const popupWidth = 260;
       let top = wordInfo.rect.bottom + 6 + window.scrollY;
       let left = wordInfo.rect.left + window.scrollX + wordInfo.rect.width / 2 - popupWidth / 2;
 
