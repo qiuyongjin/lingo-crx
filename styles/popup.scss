@@ -54,6 +54,7 @@ $z-max:                 999999;
 
 .lingo-popup {
   position: absolute;
+  box-sizing: border-box;
   z-index: $z-max;
   background: $color-bg;
   border-radius: $popup-radius;
