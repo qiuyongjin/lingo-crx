@@ -69,11 +69,13 @@ export function WordPopup({
         <div className="lingo-panel-left">
           {"word" in state && (
             <div className="lingo-word">
-              <span>{state.word}</span>
+              <div className="lingo-word-row">
+                <span className="lingo-word-text">{state.word}</span>
+                <SpeakButton word={state.word} />
+              </div>
               {state.status === "result" && state.meaning.phonetic && (
                 <span className="lingo-phonetic">{state.meaning.phonetic}</span>
               )}
-              <SpeakButton word={state.word} />
             </div>
           )}
 
