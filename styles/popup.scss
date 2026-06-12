@@ -237,11 +237,8 @@ $z-max:                 999999;
 
   // Phrase
   &-phrase {
-    display: flex;
-    justify-content: space-between;
-    gap: $spacing-sm;
     line-height: 1.35;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 
     &-text {
       color: $color-text-secondary;
@@ -250,8 +247,8 @@ $z-max:                 999999;
 
     &-tran {
       color: $color-text-muted;
-      text-align: right;
-      flex-shrink: 0;
+      font-size: 11px;
+      margin-top: 1px;
     }
   }
 
