@@ -77,6 +77,53 @@ $z-max:                 999999;
     border-right: $arrow-size solid transparent;
     border-bottom: $arrow-size solid $color-bg;
   }
+
+  // Wider variant for the split (left-right) layout
+  &--split {
+    width: 520px;
+  }
+}
+
+// ── Split Panels (Left-Right Layout) ───────────────────────────
+
+.lingo-panels {
+  display: flex;
+}
+
+.lingo-panel-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.lingo-panel-right {
+  flex: 1;
+  min-width: 0;
+  padding-left: $spacing-xl;
+  border-left: 1px solid $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lingo-placeholder {
+  text-align: center;
+  color: $color-text-muted;
+
+  &-icon {
+    font-size: 28px;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-2xs;
+  }
+
+  &-text {
+    font-size: 12px;
+  }
 }
 
 // ── Content Sections ───────────────────────────────────────────

@@ -33,7 +33,7 @@ export function WordPopup({
 }: WordPopupProps) {
   return (
     <div
-      className="lingo-popup"
+      className="lingo-popup lingo-popup--split"
       style={{ top: `${top}px`, left: `${left}px` }}
       data-testid="lingo-popup"
     >
@@ -58,78 +58,90 @@ export function WordPopup({
         </svg>
       </button>
 
-      {"word" in state && (
-        <div className="lingo-word">
-          <span>{state.word}</span>
-          {state.status === "result" && state.meaning.phonetic && (
-            <span className="lingo-phonetic">{state.meaning.phonetic}</span>
+      <div className="lingo-panels">
+        <div className="lingo-panel-left">
+          {"word" in state && (
+            <div className="lingo-word">
+              <span>{state.word}</span>
+              {state.status === "result" && state.meaning.phonetic && (
+                <span className="lingo-phonetic">{state.meaning.phonetic}</span>
+              )}
+              <SpeakButton word={state.word} />
+            </div>
           )}
-          <SpeakButton word={state.word} />
+
+          {state.status === "loading" && (
+            <>
+              <div className="lingo-loading">
+                <LoadingSpinner />
+                <span>Thinking...</span>
+              </div>
+              {state.segments && state.segments.length > 0 && (
+                <SegmentList segments={state.segments} />
+              )}
+              {state.segmentsError && (
+                <div className="lingo-segments-error">{state.segmentsError}</div>
+              )}
+            </>
+          )}
+
+          {state.status === "result" && (
+            <>
+              <div className="lingo-meaning">{state.meaning.meaning}</div>
+              {state.meaning.phrase && (
+                <div className="lingo-context">
+                  <div className="lingo-context-phrase">
+                  <span>{state.meaning.phrase}</span>
+                  <SpeakButton word={state.meaning.phrase} />
+                </div>
+                  <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
+                </div>
+              )}
+              {state.segmentsLoading && (
+                <div className="lingo-segments-loading">
+                  <LoadingSpinner />
+                  <span>拆分句子...</span>
+                </div>
+              )}
+              {state.segmentsError && (
+                <div className="lingo-segments-error">{state.segmentsError}</div>
+              )}
+              {!state.segmentsLoading && state.meaning.segments && state.meaning.segments.length > 0 && (
+                <SegmentList segments={state.meaning.segments} />
+              )}
+            </>
+          )}
+
+          {state.status === "error" && (
+            <div className="lingo-error">{state.error}</div>
+          )}
+
+          {state.status === "no-api-key" && (
+            <div>
+              <div className="lingo-no-key">
+                请先配置 DeepSeek API Key
+              </div>
+              <a
+                className="lingo-settings-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onToggleSettings();
+                }}
+              >
+                前往设置 →
+              </a>
+            </div>
+          )}
         </div>
-      )}
 
-      {state.status === "loading" && (
-        <>
-          <div className="lingo-loading">
-            <LoadingSpinner />
-            <span>Thinking...</span>
+        <div className="lingo-panel-right">
+          <div className="lingo-placeholder">
+            <div className="lingo-placeholder-icon">✨</div>
+            <div className="lingo-placeholder-title">更多功能</div>
+            <div className="lingo-placeholder-text">即将推出</div>
           </div>
-          {state.segments && state.segments.length > 0 && (
-            <SegmentList segments={state.segments} />
-          )}
-          {state.segmentsError && (
-            <div className="lingo-segments-error">{state.segmentsError}</div>
-          )}
-        </>
-      )}
-
-      {state.status === "result" && (
-        <>
-          <div className="lingo-meaning">{state.meaning.meaning}</div>
-          {state.meaning.phrase && (
-            <div className="lingo-context">
-              <div className="lingo-context-phrase">
-              <span>{state.meaning.phrase}</span>
-              <SpeakButton word={state.meaning.phrase} />
-            </div>
-              <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
-            </div>
-          )}
-          {state.segmentsLoading && (
-            <div className="lingo-segments-loading">
-              <LoadingSpinner />
-              <span>拆分句子...</span>
-            </div>
-          )}
-          {state.segmentsError && (
-            <div className="lingo-segments-error">{state.segmentsError}</div>
-          )}
-          {!state.segmentsLoading && state.meaning.segments && state.meaning.segments.length > 0 && (
-            <SegmentList segments={state.meaning.segments} />
-          )}
-        </>
-      )}
-
-      {state.status === "error" && (
-        <div className="lingo-error">{state.error}</div>
-      )}
-
-      {state.status === "no-api-key" && (
-        <div>
-          <div className="lingo-no-key">
-            请先配置 DeepSeek API Key
-          </div>
-          <a
-            className="lingo-settings-link"
-            onClick={(e) => {
-              e.preventDefault();
-              onToggleSettings();
-            }}
-          >
-            前往设置 →
-          </a>
         </div>
-      )}
+      </div>
 
     </div>
   );

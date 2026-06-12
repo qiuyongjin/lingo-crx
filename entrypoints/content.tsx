@@ -112,7 +112,7 @@ export default defineContentScript({
       }
 
       // Clamp left to prevent overflow off the right side
-      const maxLeft = window.scrollX + window.innerWidth - 280;
+      const maxLeft = window.scrollX + window.innerWidth - 528;
       left = Math.min(left, Math.max(maxLeft, window.scrollX + 8));
 
       // Create zero-size anchor div hosting the Shadow DOM
