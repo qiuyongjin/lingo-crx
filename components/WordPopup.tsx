@@ -72,7 +72,7 @@ export function WordPopup({
       `${clamp(arrowLeft, 12, rect.width - 12)}px`,
     );
     el.style.setProperty("--arrow-transform", "none");
-  }, [anchor]);
+  }, [anchor, enableAI]);
 
   return (
     <div
