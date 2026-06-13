@@ -105,13 +105,14 @@ $z-max:                 999999;
   flex: 0 0 260px;
   min-width: 0;
   overflow-y: auto;
+  padding-right: $spacing-lg;
 }
 
 .lingo-panel-right {
   flex: 0 0 260px;
   box-sizing: border-box;
   min-width: 0;
-  padding-left: $spacing-xl;
+  padding: $spacing-lg;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
