@@ -29,6 +29,16 @@ export interface YoudaoSentence {
   translation: string;
 }
 
+export interface YoudaoWebTranslation {
+  key: string;
+  values: string[];
+}
+
+export interface YoudaoTypoSuggestion {
+  word: string;
+  trans: string;
+}
+
 export interface YoudaoData {
   word: string;
   usphone?: string;
@@ -39,6 +49,10 @@ export interface YoudaoData {
   phrases: YoudaoPhrase[];
   relWords: YoudaoRelWord[];
   sentences: YoudaoSentence[];
+  /** Web translations — populated for non-dictionary words (names, rare terms) */
+  webTranslations?: YoudaoWebTranslation[];
+  /** "Did you mean?" spelling suggestions */
+  typoSuggestions?: YoudaoTypoSuggestion[];
 }
 
 // ---------------------------------------------------------------------------
@@ -94,6 +108,33 @@ function parseRelWords(rels: unknown[]): YoudaoRelWord[] {
       return words.length > 0 ? { pos: rel.pos as string, words } : null;
     })
     .filter((r): r is YoudaoRelWord => r !== null);
+}
+
+/** Parse `web_trans.web-translation` — web-sourced translations for non-dictionary words. */
+function parseWebTranslations(
+  webTransList: unknown[],
+): YoudaoWebTranslation[] {
+  return webTransList
+    .map((item: any) => {
+      const key: string = item?.key ?? "";
+      const values: string[] = (item?.trans ?? [])
+        .map((t: any) => t?.value ?? "")
+        .filter((v: string) => v);
+      return { key, values };
+    })
+    .filter((w) => w.key && w.values.length > 0);
+}
+
+/** Parse `typos.typo` — "did you mean?" spelling suggestions. */
+function parseTypoSuggestions(
+  typoList: unknown[],
+): YoudaoTypoSuggestion[] {
+  return typoList
+    .map((item: any) => ({
+      word: item?.word ?? "",
+      trans: item?.trans ?? "",
+    }))
+    .filter((t) => t.word);
 }
 
 /** Parse the `blng_sents_part.sentence-pair` array — bilingual example sentences. */
@@ -156,19 +197,44 @@ function parseResult(
   if (!result?.data) return null;
   const d = result.data;
   const ec = d?.ec;
-  if (!ec?.word?.[0]) return null;
 
-  const wordData = ec.word[0];
+  // Primary path: standard dictionary entry with part-of-speech translations
+  if (ec?.word?.[0]) {
+    const wordData = ec.word[0];
 
-  return {
-    word,
-    usphone: wordData.usphone || undefined,
-    ukphone: wordData.ukphone || undefined,
-    translations: parseTranslations(wordData.trs ?? []),
-    wordForms: parseWordForms(wordData.wfs ?? []),
-    examTypes: Array.isArray(ec.exam_type) ? ec.exam_type : [],
-    phrases: parsePhrases(d?.phrs?.phrs ?? []),
-    relWords: parseRelWords(d?.rel_word?.rels ?? []),
-    sentences: parseSentences(d?.blng_sents_part?.["sentence-pair"] ?? []),
-  };
+    return {
+      word,
+      usphone: wordData.usphone || undefined,
+      ukphone: wordData.ukphone || undefined,
+      translations: parseTranslations(wordData.trs ?? []),
+      wordForms: parseWordForms(wordData.wfs ?? []),
+      examTypes: Array.isArray(ec.exam_type) ? ec.exam_type : [],
+      phrases: parsePhrases(d?.phrs?.phrs ?? []),
+      relWords: parseRelWords(d?.rel_word?.rels ?? []),
+      sentences: parseSentences(d?.blng_sents_part?.["sentence-pair"] ?? []),
+    };
+  }
+
+  // Fallback: non-dictionary word (proper names, rare terms) —
+  // use web translations and typo suggestions when available
+  const webTranslations = parseWebTranslations(
+    d?.web_trans?.["web-translation"] ?? [],
+  );
+  const typoSuggestions = parseTypoSuggestions(d?.typos?.typo ?? []);
+
+  if (webTranslations.length > 0 || typoSuggestions.length > 0) {
+    return {
+      word,
+      translations: [],
+      wordForms: [],
+      examTypes: [],
+      phrases: [],
+      relWords: [],
+      sentences: [],
+      webTranslations,
+      typoSuggestions,
+    };
+  }
+
+  return null;
 }

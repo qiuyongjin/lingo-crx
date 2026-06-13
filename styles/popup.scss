@@ -278,6 +278,41 @@ $z-max:                 999999;
     }
   }
 
+  // Web translation (non-dictionary words fallback)
+  &-webtrans {
+    line-height: 1.35;
+    margin-bottom: 4px;
+
+    &-key {
+      color: $color-text-secondary;
+      font-weight: $font-weight-medium;
+    }
+
+    &-values {
+      color: $color-text-muted;
+      font-size: 11px;
+      margin-top: 1px;
+    }
+  }
+
+  // Typo / "did you mean?" suggestion
+  &-typo {
+    line-height: 1.35;
+    margin-bottom: 3px;
+    display: flex;
+    gap: $spacing-xs;
+
+    &-word {
+      color: $color-accent;
+      font-weight: $font-weight-medium;
+    }
+
+    &-trans {
+      color: $color-text-muted;
+      font-size: 11px;
+    }
+  }
+
   // Related word group
   &-relgroup {
     display: flex;
