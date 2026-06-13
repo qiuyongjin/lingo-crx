@@ -587,6 +587,69 @@ $z-max:                 999999;
     margin-left: 26px;
     line-height: 1.5;
   }
+
+  &-api-key {
+    margin-bottom: $spacing-lg;
+
+    &-label {
+      display: block;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      margin-bottom: $spacing-xs;
+      color: $color-text-secondary;
+    }
+
+    &-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid $color-border;
+      border-radius: 6px;
+      font-size: $font-size-sm;
+      font-family: monospace;
+      outline: none;
+      transition: border-color 0.15s;
+      box-sizing: border-box;
+
+      &:focus {
+        border-color: $color-accent;
+      }
+    }
+
+    &-save {
+      margin-top: $spacing-sm;
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      background: $color-accent;
+      color: #fff;
+      transition: background 0.15s;
+    }
+
+    &-saved {
+      background: #22c55e;
+    }
+
+    &-hint {
+      font-size: 12px;
+      color: $color-text-muted;
+      margin-top: $spacing-lg;
+      line-height: 1.5;
+    }
+
+    &-link {
+      color: $color-accent;
+      text-decoration: none;
+    }
+  }
+
+  &-divider {
+    height: 1px;
+    background: $color-border;
+    margin: $spacing-lg 0;
+  }
 }
 
 // ── Keyframes ──────────────────────────────────────────────────

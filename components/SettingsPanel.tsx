@@ -1,7 +1,14 @@
 // components/SettingsPanel.tsx
 
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { getRequireAltKey, setRequireAltKey, getAutoSpeak, setAutoSpeak } from "../utils/storage";
+import {
+  getApiKey,
+  setApiKey,
+  getRequireAltKey,
+  setRequireAltKey,
+  getAutoSpeak,
+  setAutoSpeak,
+} from "../utils/storage";
 import type { PopupAnchor } from "../utils/popupPosition";
 import { clamp } from "../utils/popupPosition";
 
@@ -11,17 +18,29 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ anchor, onBack }: SettingsPanelProps) {
+  const [apiKey, setApiKeyState] = useState("");
+  const [saved, setSaved] = useState(false);
   const [requireAlt, setRequireAlt] = useState(true);
   const [autoSpeak, setAutoSpeakState] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    Promise.all([getRequireAltKey(), getAutoSpeak()]).then(([alt, speak]) => {
-      setRequireAlt(alt);
-      setAutoSpeakState(speak);
-      setLoaded(true);
-    });
+    Promise.all([getApiKey(), getRequireAltKey(), getAutoSpeak()]).then(
+      ([key, alt, speak]) => {
+        if (key) setApiKeyState(key);
+        setRequireAlt(alt);
+        setAutoSpeakState(speak);
+        setLoaded(true);
+      },
+    );
   }, []);
+
+  async function handleSaveApiKey() {
+    const trimmed = apiKey.trim();
+    await setApiKey(trimmed);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
 
   async function handleToggle(checked: boolean) {
     setRequireAlt(checked);
@@ -100,6 +119,28 @@ export function SettingsPanel({ anchor, onBack }: SettingsPanelProps) {
         <span className="lingo-settings-title">偏好设置</span>
       </div>
 
+      <div className="lingo-settings-api-key">
+        <label className="lingo-settings-api-key-label" htmlFor="lingo-apikey">
+          DeepSeek API Key
+        </label>
+        <input
+          id="lingo-apikey"
+          type="password"
+          value={apiKey}
+          onChange={(e) => setApiKeyState(e.target.value)}
+          placeholder="sk-..."
+          className="lingo-settings-api-key-input"
+        />
+        <button
+          className={`lingo-settings-api-key-save${saved ? " lingo-settings-api-key-saved" : ""}`}
+          onClick={handleSaveApiKey}
+        >
+          {saved ? "✓ 已保存" : "保存"}
+        </button>
+      </div>
+
+      <div className="lingo-settings-divider" />
+
       <label className="lingo-settings-toggle">
         <input
           type="checkbox"
@@ -130,6 +171,19 @@ export function SettingsPanel({ anchor, onBack }: SettingsPanelProps) {
       </label>
       <p className="lingo-settings-hint">
         开启后，查词时自动朗读单词。
+      </p>
+
+      <p className="lingo-settings-api-key-hint">
+        还没有 API Key？前往{" "}
+        <a
+          href="https://platform.deepseek.com/api_keys"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="lingo-settings-api-key-link"
+        >
+          DeepSeek 开放平台
+        </a>{" "}
+        创建。
       </p>
       </div>
     </div>
