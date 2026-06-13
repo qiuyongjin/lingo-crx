@@ -134,7 +134,7 @@ export default defineContentScript({
       function PopupApp() {
         const { state, lookup, reset } = useWordMeaning();
         const [showSettings, setShowSettings] = useState(false);
-        const [enableAI, setEnableAI] = useState(true);
+        const [enableAI, setEnableAI] = useState<boolean | null>(null);
 
         useEffect(() => {
           getEnableAI().then(setEnableAI);
@@ -142,6 +142,7 @@ export default defineContentScript({
 
         // Fire API lookup once on mount, and save to history
         useEffect(() => {
+          if (enableAI === null) return; // not loaded yet
           if (enableAI) {
             lookup(word, sentence);
           }
@@ -165,6 +166,7 @@ export default defineContentScript({
             state={state}
             anchor={anchor}
             enableAI={enableAI}
+            word={word}
             onToggleSettings={() => setShowSettings(true)}
           />
         );

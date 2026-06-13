@@ -12,7 +12,8 @@ import { clamp } from "../utils/popupPosition";
 interface WordPopupProps {
   state: MeaningState;
   anchor: PopupAnchor;
-  enableAI: boolean;
+  enableAI: boolean | null;
+  word: string;
   onToggleSettings: () => void;
 }
 
@@ -20,10 +21,9 @@ export function WordPopup({
   state,
   anchor,
   enableAI,
+  word,
   onToggleSettings,
 }: WordPopupProps) {
-  // Extract word from the discriminated union — available in loading/result/error states
-  const word = "word" in state ? state.word : null;
   const { data: youdaoData, loading: youdaoLoading, fromCache } = useYoudaoDictionary(word);
 
   // Measure actual rendered size and compute the final position before paint.
@@ -100,7 +100,7 @@ export function WordPopup({
             <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
           </div>
 
-          {enableAI && (
+          {enableAI !== false && (
             <div className="lingo-panel-right">
               {state.status === "loading" && (
                 <div className="lingo-loading">
