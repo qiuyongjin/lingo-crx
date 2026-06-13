@@ -12,12 +12,14 @@ import { clamp } from "../utils/popupPosition";
 interface WordPopupProps {
   state: MeaningState;
   anchor: PopupAnchor;
+  enableAI: boolean;
   onToggleSettings: () => void;
 }
 
 export function WordPopup({
   state,
   anchor,
+  enableAI,
   onToggleSettings,
 }: WordPopupProps) {
   // Extract word from the discriminated union — available in loading/result/error states
@@ -98,46 +100,48 @@ export function WordPopup({
             <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
           </div>
 
-          <div className="lingo-panel-right">
-            {state.status === "loading" && (
-              <div className="lingo-loading">
-                <LoadingSpinner />
-                <span>Thinking...</span>
-              </div>
-            )}
-
-            {state.status === "streaming" && (
-              <div className="lingo-meaning">
-                {state.meaning}
-                <span className="lingo-cursor-blink">|</span>
-              </div>
-            )}
-
-            {state.status === "result" && (
-              <div className="lingo-meaning">{state.meaning}</div>
-            )}
-
-            {state.status === "error" && (
-              <div className="lingo-error">{state.error}</div>
-            )}
-
-            {state.status === "no-api-key" && (
-              <div>
-                <div className="lingo-no-key">
-                  请先配置 DeepSeek API Key
+          {enableAI && (
+            <div className="lingo-panel-right">
+              {state.status === "loading" && (
+                <div className="lingo-loading">
+                  <LoadingSpinner />
+                  <span>Thinking...</span>
                 </div>
-                <a
-                  className="lingo-settings-link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onToggleSettings();
-                  }}
-                >
-                  前往设置 →
-                </a>
-              </div>
-            )}
-          </div>
+              )}
+
+              {state.status === "streaming" && (
+                <div className="lingo-meaning">
+                  {state.meaning}
+                  <span className="lingo-cursor-blink">|</span>
+                </div>
+              )}
+
+              {state.status === "result" && (
+                <div className="lingo-meaning">{state.meaning}</div>
+              )}
+
+              {state.status === "error" && (
+                <div className="lingo-error">{state.error}</div>
+              )}
+
+              {state.status === "no-api-key" && (
+                <div>
+                  <div className="lingo-no-key">
+                    请先配置 DeepSeek API Key
+                  </div>
+                  <a
+                    className="lingo-settings-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onToggleSettings();
+                    }}
+                  >
+                    前往设置 →
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="lingo-footer">

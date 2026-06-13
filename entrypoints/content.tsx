@@ -7,7 +7,7 @@ import { SettingsPanel } from "../components/SettingsPanel";
 import { FloatingButton } from "../components/FloatingButton";
 import { useWordMeaning } from "../hooks/useWordMeaning";
 import { extractWordFromPoint } from "../utils/wordExtractor";
-import { getRequireAltKey, getAutoSpeak } from "../utils/storage";
+import { getRequireAltKey, getAutoSpeak, getEnableAI } from "../utils/storage";
 import { addHistoryItem } from "../utils/historyStorage";
 import popupCss from "../styles/popup.scss?inline";
 import historyCss from "../styles/history.scss?inline";
@@ -134,15 +134,22 @@ export default defineContentScript({
       function PopupApp() {
         const { state, lookup, reset } = useWordMeaning();
         const [showSettings, setShowSettings] = useState(false);
+        const [enableAI, setEnableAI] = useState(true);
+
+        useEffect(() => {
+          getEnableAI().then(setEnableAI);
+        }, []);
 
         // Fire API lookup once on mount, and save to history
         useEffect(() => {
-          lookup(word, sentence);
+          if (enableAI) {
+            lookup(word, sentence);
+          }
           // Write directly to storage so side panel's onChanged listener picks it up
           if (sentence) {
             addHistoryItem(word, sentence).catch(() => {});
           }
-        }, [word, sentence]);
+        }, [word, sentence, enableAI]);
 
         if (showSettings) {
           return (
@@ -157,6 +164,7 @@ export default defineContentScript({
           <WordPopup
             state={state}
             anchor={anchor}
+            enableAI={enableAI}
             onToggleSettings={() => setShowSettings(true)}
           />
         );
