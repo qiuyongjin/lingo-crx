@@ -97,6 +97,35 @@ async function chat(
 }
 
 /**
+ * Stream DeepSeek chat API response as text deltas.
+ * Yields each text chunk as it arrives. Throws on network / API errors.
+ */
+async function* chatStream(
+  client: OpenAI,
+  systemPrompt: string,
+  userContent: string,
+  signal?: AbortSignal,
+): AsyncGenerator<string> {
+  const stream = await client.chat.completions.create(
+    {
+      model: DEEPSEEK_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
+      ],
+      temperature: 0.3,
+      stream: true,
+    },
+    { signal },
+  );
+
+  for await (const chunk of stream) {
+    const delta = chunk.choices?.[0]?.delta?.content;
+    if (delta) yield delta;
+  }
+}
+
+/**
  * Normalize a thrown error into `{ error, code }`.
  * Handles AbortError, OpenAI APIError, and generic network errors.
  */
@@ -133,6 +162,8 @@ function normalizeError(
 // Public API
 // ---------------------------------------------------------------------------
 
+export { normalizeError };
+
 /**
  * Fetch word definition from DeepSeek.
  * When `sentence` is provided the word's contextual meaning is included.
@@ -168,5 +199,20 @@ export async function fetchDefinition(
   } catch (err) {
     return { word, ...normalizeError(err) };
   }
+}
+
+/**
+ * Stream word definition from DeepSeek.
+ * Yields text chunks as they arrive. The caller accumulates them for progressive display.
+ * Throws on API/network errors — callers should wrap in try/catch and call `normalizeError`.
+ */
+export async function* fetchDefinitionStream(
+  word: string,
+  apiKey: string,
+  sentence?: string | null,
+  signal?: AbortSignal,
+): AsyncGenerator<string> {
+  const client = createClient(apiKey);
+  yield* chatStream(client, SYSTEM_PROMPT, sentence || `查词: ${word}`, signal);
 }
 

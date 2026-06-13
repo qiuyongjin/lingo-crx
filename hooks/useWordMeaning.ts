@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getApiKey } from "../utils/storage";
-import { fetchDefinition } from "../utils/deepseek";
+import { fetchDefinitionStream, normalizeError } from "../utils/deepseek";
 
 export type MeaningState =
   | { status: "idle" }
   | { status: "loading"; word: string; sentence?: string | null }
+  | { status: "streaming"; word: string; meaning: string; sentence?: string | null }
   | { status: "result"; word: string; meaning: string; sentence?: string | null }
   | { status: "no-api-key" }
   | { status: "error"; word: string; error: string };
@@ -30,20 +31,36 @@ export function useWordMeaning() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // Fetch definition from DeepSeek
-    const contextResult = await fetchDefinition(word, apiKey, sentence ?? undefined, controller.signal);
+    try {
+      // Stream definition from DeepSeek — progressively update UI
+      let accumulated = "";
+      for await (const chunk of fetchDefinitionStream(
+        word,
+        apiKey,
+        sentence ?? undefined,
+        controller.signal,
+      )) {
+        accumulated += chunk;
+        setState({
+          status: "streaming",
+          word,
+          meaning: accumulated,
+          sentence,
+        });
+      }
 
-    if (controller.signal.aborted) return;
+      if (controller.signal.aborted) return;
 
-    if ("meaning" in contextResult) {
       setState({
         status: "result",
-        word: contextResult.word,
-        meaning: contextResult.meaning,
+        word,
+        meaning: accumulated,
         sentence,
       });
-    } else {
-      setState({ status: "error", word: contextResult.word, error: contextResult.error });
+    } catch (err) {
+      if (controller.signal.aborted) return;
+      const { error } = normalizeError(err);
+      setState({ status: "error", word, error });
     }
   }
 

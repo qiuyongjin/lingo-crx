@@ -64,6 +64,13 @@ export function WordPopup({
               </div>
             )}
 
+            {state.status === "streaming" && (
+              <div className="lingo-meaning">
+                {state.meaning}
+                <span className="lingo-cursor-blink">|</span>
+              </div>
+            )}
+
             {state.status === "result" && (
               <div className="lingo-meaning">{state.meaning}</div>
             )}

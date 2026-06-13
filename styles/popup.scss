@@ -383,6 +383,11 @@ $z-max:                 999999;
   white-space: pre-line;
 }
 
+.lingo-cursor-blink {
+  color: $color-accent;
+  animation: lingo-blink 0.7s step-end infinite;
+}
+
 // ── Loading State ──────────────────────────────────────────────
 
 .lingo-loading {
@@ -586,4 +591,9 @@ $z-max:                 999999;
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes lingo-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
