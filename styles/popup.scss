@@ -355,7 +355,7 @@ $z-max:                 999999;
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
-  margin-bottom: $spacing-2xs;
+  margin-bottom: $spacing-sm;
 }
 
 .lingo-word-row {
@@ -369,38 +369,17 @@ $z-max:                 999999;
 }
 
 .lingo-phonetic {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: normal;
   color: $color-text-muted;
   margin-top: $spacing-2xs;
+  display: flex;
+  gap: $spacing-md;
 }
 
 .lingo-meaning {
   font-size: $font-size-sm;
   color: $color-text-secondary;
-}
-
-// ── Context (phrase + translation) ─────────────────────────────
-
-.lingo-context {
-  margin-top: $spacing-sm;
-  padding-top: $spacing-sm;
-  border-top: $separator;
-
-  &-phrase {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    font-size: $font-size-sm;
-    color: $color-accent;
-    font-weight: $font-weight-medium;
-  }
-
-  &-translation {
-    font-size: $font-size-sm;
-    color: $color-text-tertiary;
-    margin-top: $spacing-2xs;
-  }
 }
 
 // ── Loading State ──────────────────────────────────────────────
@@ -521,57 +500,6 @@ $z-max:                 999999;
   color: $color-text-muted;
   font-style: italic;
   word-break: break-word;
-}
-
-// ── Sentence Segments ──────────────────────────────────────────
-
-.lingo-segments {
-  margin-top: $spacing-sm;
-  padding-top: $spacing-sm;
-  border-top: $separator;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-}
-
-.lingo-segment {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-
-  &-text {
-    font-size: $font-size-sm;
-    color: $color-text-primary;
-    font-weight: $font-weight-medium;
-    word-break: break-word;
-  }
-
-  &-translation {
-    font-size: 13px;
-    color: $color-text-tertiary;
-    word-break: break-word;
-  }
-}
-
-// ── Segments Loading State ──────────────────────────────────────
-
-.lingo-segments-loading {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  font-size: 13px;
-  color: $color-text-muted;
-  margin-top: $spacing-sm;
-  padding-top: $spacing-sm;
-  border-top: $separator;
-}
-
-.lingo-segments-error {
-  font-size: 13px;
-  color: $color-error;
-  margin-top: $spacing-sm;
-  padding-top: $spacing-sm;
-  border-top: $separator;
 }
 
 // ── Settings Panel ────────────────────────────────────────────

@@ -5,7 +5,6 @@ import { useYoudaoDictionary } from "../hooks/useYoudaoDictionary";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { SpeakButton } from "./SpeakButton";
 import { YoudaoPanel } from "./YoudaoPanel";
-import { SentenceSegment } from "../utils/deepseek";
 
 interface WordPopupProps {
   state: MeaningState;
@@ -13,19 +12,6 @@ interface WordPopupProps {
   left: number;
   arrowLeft: number;
   onToggleSettings: () => void;
-}
-
-function SegmentList({ segments }: { segments: SentenceSegment[] }) {
-  return (
-    <div className="lingo-segments">
-      {segments.map((seg, i) => (
-        <div key={i} className="lingo-segment">
-          <div className="lingo-segment-text">{seg.text}</div>
-          <div className="lingo-segment-translation">{seg.translation}</div>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export function WordPopup({
@@ -53,62 +39,33 @@ export function WordPopup({
       <div className="lingo-popup-scroll">
         <div className="lingo-panels">
           <div className="lingo-panel-left">
-            <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
-          </div>
-
-          <div className="lingo-panel-right">
             {"word" in state && (
               <div className="lingo-word">
                 <div className="lingo-word-row">
                   <span className="lingo-word-text">{state.word}</span>
                   <SpeakButton word={state.word} />
                 </div>
-                {state.status === "result" && state.meaning.phonetic && (
-                  <span className="lingo-phonetic">{state.meaning.phonetic}</span>
+                {youdaoData && (youdaoData.ukphone || youdaoData.usphone) && (
+                  <span className="lingo-phonetic">
+                    {youdaoData.ukphone && <span className="lingo-phonetic-uk">英 {youdaoData.ukphone}</span>}
+                    {youdaoData.usphone && <span className="lingo-phonetic-us">美 {youdaoData.usphone}</span>}
+                  </span>
                 )}
               </div>
             )}
+            <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
+          </div>
 
+          <div className="lingo-panel-right">
             {state.status === "loading" && (
-              <>
-                <div className="lingo-loading">
-                  <LoadingSpinner />
-                  <span>Thinking...</span>
-                </div>
-                {state.segments && state.segments.length > 0 && (
-                  <SegmentList segments={state.segments} />
-                )}
-                {state.segmentsError && (
-                  <div className="lingo-segments-error">{state.segmentsError}</div>
-                )}
-              </>
+              <div className="lingo-loading">
+                <LoadingSpinner />
+                <span>Thinking...</span>
+              </div>
             )}
 
             {state.status === "result" && (
-              <>
-                <div className="lingo-meaning">{state.meaning.meaning}</div>
-                {state.meaning.phrase && (
-                  <div className="lingo-context">
-                    <div className="lingo-context-phrase">
-                      <span>{state.meaning.phrase}</span>
-                      <SpeakButton word={state.meaning.phrase} />
-                    </div>
-                    <div className="lingo-context-translation">{state.meaning.phraseMeaning}</div>
-                  </div>
-                )}
-                {state.segmentsLoading && (
-                  <div className="lingo-segments-loading">
-                    <LoadingSpinner />
-                    <span>拆分句子...</span>
-                  </div>
-                )}
-                {state.segmentsError && (
-                  <div className="lingo-segments-error">{state.segmentsError}</div>
-                )}
-                {!state.segmentsLoading && state.meaning.segments && state.meaning.segments.length > 0 && (
-                  <SegmentList segments={state.meaning.segments} />
-                )}
-              </>
+              <div className="lingo-meaning">{state.meaning.meaning}</div>
             )}
 
             {state.status === "error" && (
