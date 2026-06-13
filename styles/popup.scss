@@ -84,22 +84,27 @@ $z-max:                 999999;
 
 }
 
-// ── Scrollable inner wrapper (avoids clipping ::after arrow) ──
+// ── Flex column wrapper — footer stays fixed, panels fill remaining space ──
 
 .lingo-popup-scroll {
+  display: flex;
+  flex-direction: column;
   max-height: 350px;
-  overflow-y: auto;
 }
 
-// ── Split Panels (Left-Right Layout) ───────────────────────────
+// ── Split Panels (Left-Right Layout, independent scroll) ──────────
 
 .lingo-panels {
   display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .lingo-panel-left {
   flex: 0 0 300px;
   min-width: 0;
+  overflow-y: auto;
 }
 
 .lingo-panel-right {
@@ -110,6 +115,7 @@ $z-max:                 999999;
   border-left: 1px solid $color-border;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .lingo-placeholder {
@@ -438,6 +444,8 @@ $z-max:                 999999;
 .lingo-footer {
   display: flex;
   justify-content: flex-end;
+  flex-shrink: 0;
+  padding-top: $spacing-xs;
 }
 
 // ── Settings Button ───────────────────────────────────────────
