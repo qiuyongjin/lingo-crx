@@ -1,15 +1,16 @@
 // components/SettingsPanel.tsx
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { getRequireAltKey, setRequireAltKey, getAutoSpeak, setAutoSpeak } from "../utils/storage";
+import type { PopupAnchor } from "../utils/popupPosition";
+import { clamp } from "../utils/popupPosition";
 
 interface SettingsPanelProps {
-  top: number;
-  left: number;
+  anchor: PopupAnchor;
   onBack: () => void;
 }
 
-export function SettingsPanel({ top, left, onBack }: SettingsPanelProps) {
+export function SettingsPanel({ anchor, onBack }: SettingsPanelProps) {
   const [requireAlt, setRequireAlt] = useState(true);
   const [autoSpeak, setAutoSpeakState] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -27,9 +28,43 @@ export function SettingsPanel({ top, left, onBack }: SettingsPanelProps) {
     await setRequireAltKey(checked);
   }
 
+  // Measure actual rendered size and compute the final position before paint.
+  // No hardcoded widths — adapts automatically to any CSS changes.
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const margin = 8;
+
+    // Compute position in viewport coords, then convert to document coords.
+    const anchorVpX = anchor.x - window.scrollX;
+    const anchorVpY = anchor.y - window.scrollY;
+
+    // Center horizontally below the word
+    let left = anchorVpX - rect.width / 2;
+
+    // Flip above the word if the popup would overflow the viewport bottom
+    let top = anchorVpY;
+    if (top + rect.height > window.innerHeight - margin) {
+      const wordTopVp = anchor.wordTop - window.scrollX;
+      top = wordTopVp - 6 - rect.height; // 6px gap above word
+    }
+
+    // Clamp to viewport with margin
+    left = clamp(left, margin, window.innerWidth - rect.width - margin);
+    top = clamp(top, margin, window.innerHeight - rect.height - margin);
+
+    // Convert to document coords for the absolute-positioned container
+    el.style.left = `${left + window.scrollX}px`;
+    el.style.top = `${top + window.scrollY}px`;
+  }, [anchor]);
+
   if (!loaded) {
     return (
-      <div className="lingo-popup" style={{ top: `${top}px`, left: `${left}px` }}>
+      <div ref={panelRef} className="lingo-popup">
         <div className="lingo-settings">
           <div className="lingo-loading">
             <span>加载中...</span>
@@ -40,7 +75,7 @@ export function SettingsPanel({ top, left, onBack }: SettingsPanelProps) {
   }
 
   return (
-    <div className="lingo-popup" style={{ top: `${top}px`, left: `${left}px` }}>
+    <div ref={panelRef} className="lingo-popup">
       <div className="lingo-settings">
         <div className="lingo-settings-header">
         <button

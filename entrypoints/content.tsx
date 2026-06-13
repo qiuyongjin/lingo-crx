@@ -98,40 +98,14 @@ export default defineContentScript({
         }
       });
 
-      // Calculate position: below the word, 6px gap, centered horizontally.
-      // Document coordinates — shadow host is position:absolute at document (0,0).
-      // Popup widths — WordPopup (split) is sized by its child panels:
-      //   popup-padding(14) + panel-left(300) + panel-right(200) + popup-padding(14) = 528px
-      // SettingsPanel uses the base .lingo-popup width (300px).
-      const wordPopupWidth = 528;
-      const settingsPopupWidth = 300;
+      // Compute anchor point in document coords (shadow host is absolute at doc 0,0).
+      // Each component measures its own rendered size in useLayoutEffect and
+      // positions itself relative to this anchor — no hardcoded widths needed.
       const wordCenterX = wordInfo.rect.left + window.scrollX + wordInfo.rect.width / 2;
+      const wordBottomY = wordInfo.rect.bottom + 6 + window.scrollY; // 6px gap below word
+      const wordTopY = wordInfo.rect.top + window.scrollY;
 
-      let top = wordInfo.rect.bottom + 6 + window.scrollY;
-      let wordPopupLeft = wordCenterX - wordPopupWidth / 2;
-      let settingsPopupLeft = wordCenterX - settingsPopupWidth / 2;
-
-      // If popup would overflow viewport bottom, flip above the word
-      const estimatedHeight = 60;
-      if (top + estimatedHeight > window.scrollY + window.innerHeight) {
-        top = wordInfo.rect.top - 6 - estimatedHeight + window.scrollY;
-        if (top < window.scrollY) {
-          top = wordInfo.rect.bottom + 6 + window.scrollY;
-        }
-      }
-
-      // Clamp horizontal position to keep each popup fully within the viewport
-      const wordMinLeft = window.scrollX + 8;
-      const wordMaxLeft = window.scrollX + window.innerWidth - wordPopupWidth - 8;
-      wordPopupLeft = Math.min(wordMaxLeft, Math.max(wordMinLeft, wordPopupLeft));
-
-      const settingsMinLeft = window.scrollX + 8;
-      const settingsMaxLeft = window.scrollX + window.innerWidth - settingsPopupWidth - 8;
-      settingsPopupLeft = Math.min(settingsMaxLeft, Math.max(settingsMinLeft, settingsPopupLeft));
-
-      // Arrow horizontal position — points to word center, relative to WordPopup left edge
-      let arrowLeft = wordCenterX - wordPopupLeft - 6; // -6: half arrow width so tip aligns with word center
-      arrowLeft = Math.min(wordPopupWidth - 12, Math.max(12, arrowLeft));
+      const anchor = { x: wordCenterX, y: wordBottomY, wordTop: wordTopY };
 
       // Create zero-size anchor div hosting the Shadow DOM.
       // position:absolute at document (0,0) so the popup scrolls with the page.
@@ -173,8 +147,7 @@ export default defineContentScript({
         if (showSettings) {
           return (
             <SettingsPanel
-              top={top}
-              left={settingsPopupLeft}
+              anchor={anchor}
               onBack={() => setShowSettings(false)}
             />
           );
@@ -183,9 +156,7 @@ export default defineContentScript({
         return (
           <WordPopup
             state={state}
-            top={top}
-            left={wordPopupLeft}
-            arrowLeft={arrowLeft}
+            anchor={anchor}
             onToggleSettings={() => setShowSettings(true)}
           />
         );

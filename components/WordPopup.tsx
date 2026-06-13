@@ -1,39 +1,81 @@
 // components/WordPopup.tsx
 
+import { useRef, useLayoutEffect } from "react";
 import { MeaningState } from "../hooks/useWordMeaning";
 import { useYoudaoDictionary } from "../hooks/useYoudaoDictionary";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { SpeakButton } from "./SpeakButton";
 import { YoudaoPanel } from "./YoudaoPanel";
+import type { PopupAnchor } from "../utils/popupPosition";
+import { clamp } from "../utils/popupPosition";
 
 interface WordPopupProps {
   state: MeaningState;
-  top: number;
-  left: number;
-  arrowLeft: number;
+  anchor: PopupAnchor;
   onToggleSettings: () => void;
 }
 
 export function WordPopup({
   state,
-  top,
-  left,
-  arrowLeft,
+  anchor,
   onToggleSettings,
 }: WordPopupProps) {
   // Extract word from the discriminated union — available in loading/result/error states
   const word = "word" in state ? state.word : null;
   const { data: youdaoData, loading: youdaoLoading } = useYoudaoDictionary(word);
 
+  // Measure actual rendered size and compute the final position before paint.
+  // The popup width depends on CSS panel widths + padding — by measuring the
+  // live DOM we stay correct regardless of CSS changes.  useLayoutEffect runs
+  // synchronously after DOM commit but before the browser paints, so there
+  // is no visible flash.
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const el = popupRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const margin = 8;
+
+    // Convert anchor from document to viewport coords
+    const anchorVpX = anchor.x - window.scrollX;
+    const anchorVpY = anchor.y - window.scrollY;
+
+    // Target: centered below the word
+    let left = anchorVpX - rect.width / 2;
+    let top = anchorVpY;
+
+    // Flip above the word if the popup would overflow the viewport bottom.
+    if (top + rect.height > window.innerHeight - margin) {
+      const wordTopVp = anchor.wordTop - window.scrollX;
+      top = wordTopVp - 6 - rect.height; // 6px gap below arrow
+    }
+
+    // Clamp horizontal within viewport (8px margin)
+    left = clamp(left, margin, window.innerWidth - rect.width - margin);
+
+    // Clamp vertical within viewport
+    top = clamp(top, margin, window.innerHeight - rect.height - margin);
+
+    // Apply position in document coords (container is at doc 0,0)
+    el.style.left = `${left + window.scrollX}px`;
+    el.style.top = `${top + window.scrollY}px`;
+
+    // Arrow: point at the word center, relative to the popup's left edge.
+    // Clamp within popup bounds so the arrow doesn't point outside the popup.
+    const arrowLeft = anchorVpX - left;
+    el.style.setProperty(
+      "--arrow-left",
+      `${clamp(arrowLeft, 12, rect.width - 12)}px`,
+    );
+    el.style.setProperty("--arrow-transform", "none");
+  }, [anchor]);
+
   return (
     <div
+      ref={popupRef}
       className="lingo-popup"
-      style={{
-        top: `${top}px`,
-        left: `${left}px`,
-        "--arrow-left": `${arrowLeft}px`,
-        "--arrow-transform": "none",
-      } as React.CSSProperties}
       data-testid="lingo-popup"
     >
       <div className="lingo-popup-scroll">
