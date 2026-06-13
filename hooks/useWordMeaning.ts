@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getApiKey } from "../utils/storage";
-import { fetchDefinition, ContextualMeaning } from "../utils/deepseek";
+import { fetchDefinition } from "../utils/deepseek";
 
 export type MeaningState =
   | { status: "idle" }
   | { status: "loading"; word: string; sentence?: string | null }
-  | { status: "result"; word: string; meaning: ContextualMeaning; sentence?: string | null }
+  | { status: "result"; word: string; meaning: string; sentence?: string | null }
   | { status: "no-api-key" }
   | { status: "error"; word: string; error: string };
 

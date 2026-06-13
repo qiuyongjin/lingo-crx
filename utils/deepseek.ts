@@ -10,7 +10,7 @@ const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 const DEEPSEEK_MODEL = "deepseek-v4-flash";
 
 // ---------------------------------------------------------------------------
-// System prompts
+// System prompt
 // ---------------------------------------------------------------------------
 
 const SYSTEM_PROMPT = `你是词典助手。给出单词的中文释义。
@@ -21,22 +21,15 @@ const SYSTEM_PROMPT = `你是词典助手。给出单词的中文释义。
 ## 用户仅提供单词时
 给出常见中文释义。
 
-JSON格式：
-{"meaning":"中文释义"}
-
-仅输出JSON，不要任何解释或额外文字。`;
+直接返回中文释义，不要额外解释。`;
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface ContextualMeaning {
-  meaning: string;
-}
-
 export interface DefinitionResult {
   word: string;
-  meaning: ContextualMeaning;
+  meaning: string;
 }
 
 export interface DefinitionError {
@@ -60,18 +53,9 @@ function createClient(apiKey: string): OpenAI {
   });
 }
 
-/** Strip markdown code fences from LLM JSON output. */
-function stripJsonFences(raw: string): string {
-  return raw
-    .replace(/\r\n/g, "\n")
-    .replace(/^```(?:json)?\s*\n?/, "")
-    .replace(/\n?```\s*$/, "")
-    .trim();
-}
-
 /**
- * Call DeepSeek chat API and return the parsed JSON response.
- * Returns `null` when the response is empty, malformed, or not a JSON object.
+ * Call DeepSeek chat API and return the response text.
+ * Returns `null` when the response is empty.
  * Throws on network / API errors (handled by callers via `normalizeError`).
  */
 async function chat(
@@ -79,7 +63,7 @@ async function chat(
   systemPrompt: string,
   userContent: string,
   signal?: AbortSignal,
-): Promise<Record<string, unknown> | null> {
+): Promise<string | null> {
   const response = await client.chat.completions.create(
     {
       model: DEEPSEEK_MODEL,
@@ -87,25 +71,13 @@ async function chat(
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent },
       ],
-      response_format: { type: "json_object" },
       temperature: 0.3,
     },
     { signal },
   );
 
   const raw = response.choices?.[0]?.message?.content?.trim();
-  if (!raw) return null;
-
-  const cleaned = stripJsonFences(raw);
-  try {
-    const parsed = JSON.parse(cleaned);
-    if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
-      return parsed as Record<string, unknown>;
-    }
-  } catch {
-    /* JSON parse failed — treat as empty response */
-  }
-  return null;
+  return raw || null;
 }
 
 /**
@@ -158,14 +130,14 @@ export async function fetchDefinition(
   const client = createClient(apiKey);
 
   try {
-    const data = await chat(
+    const text = await chat(
       client,
       SYSTEM_PROMPT,
       sentence || `查词: ${word}`,
       signal,
     );
 
-    if (!data) {
+    if (!text) {
       return {
         word,
         error: "解析释义失败，请重试",
@@ -175,9 +147,7 @@ export async function fetchDefinition(
 
     return {
       word,
-      meaning: {
-        meaning: typeof data.meaning === "string" ? data.meaning : "未找到释义",
-      },
+      meaning: text,
     };
   } catch (err) {
     return { word, ...normalizeError(err) };

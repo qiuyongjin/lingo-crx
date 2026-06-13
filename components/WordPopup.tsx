@@ -65,7 +65,7 @@ export function WordPopup({
             )}
 
             {state.status === "result" && (
-              <div className="lingo-meaning">{state.meaning.meaning}</div>
+              <div className="lingo-meaning">{state.meaning}</div>
             )}
 
             {state.status === "error" && (
