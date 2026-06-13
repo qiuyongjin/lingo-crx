@@ -375,6 +375,10 @@ $z-max:                 999999;
 
 .lingo-word-text {
   font-size: 20px;
+
+  &-cached {
+    color: $color-accent;
+  }
 }
 
 .lingo-phonetic {

@@ -104,8 +104,8 @@ export default defineBackground(() => {
     if (message.type === "fetchYoudao") {
       const word = message.word as string;
       fetchYoudaoWithCache(word)
-        .then((data) => sendResponse({ data }))
-        .catch(() => sendResponse({ data: null }));
+        .then((result) => sendResponse({ data: result.data, fromCache: result.fromCache }))
+        .catch(() => sendResponse({ data: null, fromCache: false }));
       return true; // keep the message channel open for async response
     }
   });
@@ -116,10 +116,12 @@ export default defineBackground(() => {
    * 2. On cache hit, return immediately
    * 3. On cache miss, fetch from Youdao and cache the result
    */
-  async function fetchYoudaoWithCache(word: string): Promise<any> {
+  async function fetchYoudaoWithCache(
+    word: string,
+  ): Promise<{ data: any; fromCache: boolean }> {
     // 1. Try cache
     const cached = await fetchCachedDictionary(word, "en", "zh");
-    if (cached) return cached;
+    if (cached) return { data: cached, fromCache: true };
 
     // 2. Cache miss — fetch from Youdao
     const data = await fetchWithRetry(
@@ -129,9 +131,10 @@ export default defineBackground(() => {
     // 3. Cache the result for next time (fire-and-forget)
     if (data) {
       cacheDictionaryEntry(word, "en", "zh", data);
+      return { data, fromCache: true };
     }
 
-    return data;
+    return { data, fromCache: false };
   }
 
   // Track side panel lifecycle via long-lived port.

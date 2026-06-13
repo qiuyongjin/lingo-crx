@@ -159,11 +159,11 @@ function parseSentences(pairs: unknown[]): YoudaoSentence[] {
 export async function fetchYoudaoDictionary(
   word: string,
   signal?: AbortSignal,
-): Promise<YoudaoData | null> {
+): Promise<{ data: YoudaoData | null; fromCache: boolean }> {
   const fetchPromise = chrome.runtime.sendMessage({
     type: "fetchYoudao",
     word,
-  }) as Promise<{ data: any }>;
+  }) as Promise<{ data: any; fromCache: boolean }>;
 
   let abortReject: (() => void) | null = null;
   if (signal) {
@@ -174,9 +174,12 @@ export async function fetchYoudaoDictionary(
 
     try {
       const result = await Promise.race([fetchPromise, abortPromise]);
-      return parseResult(word, result);
+      return {
+        data: parseResult(word, result),
+        fromCache: result?.fromCache ?? false,
+      };
     } catch {
-      return null;
+      return { data: null, fromCache: false };
     } finally {
       if (abortReject) signal.removeEventListener("abort", abortReject);
     }
@@ -184,9 +187,12 @@ export async function fetchYoudaoDictionary(
 
   try {
     const result = await fetchPromise;
-    return parseResult(word, result);
+    return {
+      data: parseResult(word, result),
+      fromCache: result?.fromCache ?? false,
+    };
   } catch {
-    return null;
+    return { data: null, fromCache: false };
   }
 }
 

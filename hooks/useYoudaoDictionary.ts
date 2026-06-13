@@ -6,12 +6,14 @@ import { fetchYoudaoDictionary, YoudaoData } from "../utils/youdao";
 export function useYoudaoDictionary(word: string | null) {
   const [data, setData] = useState<YoudaoData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [fromCache, setFromCache] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     // Cancel any in-flight request
     abortRef.current?.abort();
     setData(null);
+    setFromCache(false);
 
     if (!word) {
       setLoading(false);
@@ -26,7 +28,8 @@ export function useYoudaoDictionary(word: string | null) {
     fetchYoudaoDictionary(word, controller.signal)
       .then((result) => {
         if (!controller.signal.aborted) {
-          setData(result);
+          setData(result.data);
+          setFromCache(result.fromCache);
           setLoading(false);
         }
       })
@@ -39,5 +42,5 @@ export function useYoudaoDictionary(word: string | null) {
     return () => controller.abort();
   }, [word]);
 
-  return { data, loading };
+  return { data, loading, fromCache };
 }

@@ -22,7 +22,7 @@ export function WordPopup({
 }: WordPopupProps) {
   // Extract word from the discriminated union — available in loading/result/error states
   const word = "word" in state ? state.word : null;
-  const { data: youdaoData, loading: youdaoLoading } = useYoudaoDictionary(word);
+  const { data: youdaoData, loading: youdaoLoading, fromCache } = useYoudaoDictionary(word);
 
   // Measure actual rendered size and compute the final position before paint.
   // The popup width depends on CSS panel widths + padding — by measuring the
@@ -84,7 +84,7 @@ export function WordPopup({
             {"word" in state && (
               <div className="lingo-word">
                 <div className="lingo-word-row">
-                  <span className="lingo-word-text">{state.word}</span>
+                  <span className={`lingo-word-text${fromCache ? " lingo-word-text-cached" : ""}`}>{state.word}</span>
                   <SpeakButton word={state.word} />
                 </div>
                 {youdaoData && (youdaoData.ukphone || youdaoData.usphone) && (
