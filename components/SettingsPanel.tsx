@@ -8,6 +8,8 @@ import {
   setRequireAltKey,
   getAutoSpeak,
   setAutoSpeak,
+  getEnableAI,
+  setEnableAI,
 } from "../utils/storage";
 import type { PopupAnchor } from "../utils/popupPosition";
 import { clamp } from "../utils/popupPosition";
@@ -22,14 +24,16 @@ export function SettingsPanel({ anchor, onBack }: SettingsPanelProps) {
   const [saved, setSaved] = useState(false);
   const [requireAlt, setRequireAlt] = useState(true);
   const [autoSpeak, setAutoSpeakState] = useState(false);
+  const [enableAI, setEnableAIState] = useState(true);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    Promise.all([getApiKey(), getRequireAltKey(), getAutoSpeak()]).then(
-      ([key, alt, speak]) => {
+    Promise.all([getApiKey(), getRequireAltKey(), getAutoSpeak(), getEnableAI()]).then(
+      ([key, alt, speak, ai]) => {
         if (key) setApiKeyState(key);
         setRequireAlt(alt);
         setAutoSpeakState(speak);
+        setEnableAIState(ai);
         setLoaded(true);
       },
     );
@@ -171,6 +175,24 @@ export function SettingsPanel({ anchor, onBack }: SettingsPanelProps) {
       </label>
       <p className="lingo-settings-hint">
         开启后，查词时自动朗读单词。
+      </p>
+
+      <label className="lingo-settings-toggle">
+        <input
+          type="checkbox"
+          checked={enableAI}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            setEnableAIState(checked);
+            setEnableAI(checked);
+          }}
+        />
+        <span className="lingo-settings-toggle-label">
+          启用 AI 解释
+        </span>
+      </label>
+      <p className="lingo-settings-hint">
+        开启后，点击单词会显示 DeepSeek AI 智能释义。
       </p>
 
       <p className="lingo-settings-api-key-hint">
