@@ -1,3 +1,5 @@
+import { cacheDictionaryEntry, fetchCachedDictionary } from "../utils/dictionaryCache";
+
 export default defineBackground(() => {
   let activeSidePanelTabId: number | null = null;
   // Track active tab proactively so command handler can stay synchronous
@@ -101,14 +103,36 @@ export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.type === "fetchYoudao") {
       const word = message.word as string;
-      fetchWithRetry(
-        `https://dict.youdao.com/jsonapi?q=${encodeURIComponent(word)}`,
-      )
+      fetchYoudaoWithCache(word)
         .then((data) => sendResponse({ data }))
         .catch(() => sendResponse({ data: null }));
       return true; // keep the message channel open for async response
     }
   });
+
+  /**
+   * Cache-first Youdao lookup:
+   * 1. Try the Lingo cache server first
+   * 2. On cache hit, return immediately
+   * 3. On cache miss, fetch from Youdao and cache the result
+   */
+  async function fetchYoudaoWithCache(word: string): Promise<any> {
+    // 1. Try cache
+    const cached = await fetchCachedDictionary(word, "en", "zh");
+    if (cached) return cached;
+
+    // 2. Cache miss — fetch from Youdao
+    const data = await fetchWithRetry(
+      `https://dict.youdao.com/jsonapi?q=${encodeURIComponent(word)}`,
+    );
+
+    // 3. Cache the result for next time (fire-and-forget)
+    if (data) {
+      cacheDictionaryEntry(word, "en", "zh", data);
+    }
+
+    return data;
+  }
 
   // Track side panel lifecycle via long-lived port.
   // The port auto-disconnects when the panel page is destroyed (closed).
