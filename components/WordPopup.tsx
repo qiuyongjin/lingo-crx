@@ -83,20 +83,18 @@ export function WordPopup({
       <div className="lingo-popup-scroll">
         <div className="lingo-panels">
           <div className="lingo-panel-left">
-            {"word" in state && (
-              <div className="lingo-word">
-                <div className="lingo-word-row">
-                  <span className={`lingo-word-text${fromCache ? " lingo-word-text-cached" : ""}`}>{state.word}</span>
-                  <SpeakButton word={state.word} />
-                </div>
-                {youdaoData && (youdaoData.ukphone || youdaoData.usphone) && (
-                  <span className="lingo-phonetic">
-                    {youdaoData.ukphone && <span className="lingo-phonetic-uk">英 {youdaoData.ukphone}</span>}
-                    {youdaoData.usphone && <span className="lingo-phonetic-us">美 {youdaoData.usphone}</span>}
-                  </span>
-                )}
+            <div className="lingo-word">
+              <div className="lingo-word-row">
+                <span className={`lingo-word-text${fromCache ? " lingo-word-text-cached" : ""}`}>{word}</span>
+                <SpeakButton word={word} />
               </div>
-            )}
+              {youdaoData && (youdaoData.ukphone || youdaoData.usphone) && (
+                <span className="lingo-phonetic">
+                  {youdaoData.ukphone && <span className="lingo-phonetic-uk">英 {youdaoData.ukphone}</span>}
+                  {youdaoData.usphone && <span className="lingo-phonetic-us">美 {youdaoData.usphone}</span>}
+                </span>
+              )}
+            </div>
             <YoudaoPanel data={youdaoData} loading={youdaoLoading} word={word} />
           </div>
 
