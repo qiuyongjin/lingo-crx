@@ -102,20 +102,22 @@ $z-max:                 999999;
 }
 
 .lingo-panel-left {
-  flex: 0 0 300px;
+  flex: 0 0 260px;
   min-width: 0;
   overflow-y: auto;
 }
 
 .lingo-panel-right {
-  flex: 0 0 200px;
+  flex: 0 0 260px;
   box-sizing: border-box;
   min-width: 0;
   padding-left: $spacing-xl;
-  border-left: 1px solid $color-border;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  background: #f1f5f9;
+  border: 1px solid $color-border;
+  border-radius: 6px;
 }
 
 .lingo-placeholder {
